@@ -28,15 +28,15 @@ data ApplicationSettings = ApplicationSettings
     , appDetailedRequestLogging :: Bool
     }
 
-instance FromJson ApplicationSettings where -- "aeson", module Data.Aeson
-    parseJson =
+instance FromJSON ApplicationSettings where -- "aeson", module Data.Aeson
+    parseJSON =
         withObject "ApplicationSettings" $ \ob -> do
             let defEnv = True
             appStaticDir <- ob .: "static-dir"
             appRoot <- ob .:? "app-root"
             appHost <- fromString <$> ob .: "app-host"
             appDatabaseConf <- ob .: "database-conf"
-            appProt <- ob .: "app-port"
+            appPort <- ob .: "app-port"
             dev <- ob .: "development" .!= defEnv
             appReloadTemplate <- ob .:?  "reload-template" .!= dev
             appMutableStatic <- ob .:? "mutable-static" .!= dev
@@ -48,4 +48,4 @@ configSettingsYmlBS :: ByteString
 configSettingsYmlBS = $(embedFile configSettingsYml) -- package "file-embed", module Data.Embed
 
 configSettingsYmlValue :: Value
-configSettingsYmlValue = eigher Exception.throw id $ decodeEither' configSettingsYmlBS -- package "yaml", module Data.Yaml
+configSettingsYmlValue = either Exception.throw id $ decodeEither' configSettingsYmlBS -- package "yaml", module Data.Yaml

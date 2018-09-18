@@ -18,7 +18,7 @@ data App = App
     , appConnectionPool :: ConnectionPool -- from "persistent", module Database.Persist.Sql
     , appLogger :: Logger -- from module Yesod.Core.Types
     , appStatic :: Static -- From "yesod-static", module Yesod.Static
-    , appHttpManager :: manager -- from "http-client", module Network.HTTP.Client
+    , appHttpManager :: Manager -- from "http-client", module Network.HTTP.Client
     }
 
 mkYesodData

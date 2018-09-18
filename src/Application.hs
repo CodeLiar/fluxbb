@@ -55,7 +55,29 @@ newMain = do
     runSettings (warpSettings app) commonapp
 
 makeFoundation :: ApplicationSettings -> IO App
-makeFoundation appSetting = do
+makeFoundation appSettings = do
+    appHttpManager <- getGlobalManager
+    appLogger <- newStdoutLoggerSet defaultBufSize >>= makeYesodLogger
+    appStatic <-
+        (if appMutableStatic appSettings
+        then staticDevel
+        else static)
+        (appStaticDir appSettings)
+    let mkFoundation appConnectionPool = App {..}
+        tempFoundation =
+            mkFoundation $ error "Connection pool forced in tempFoundation"
+        logFunc = messageLoggerSource tempFoundation appLogger
+    pool <-
+        flip runLoggingT logFunc $
+        createPostgresqlPool
+        (pgConnStr $ appDatabaseConf appSettings)
+        (pgPoolSize $ appDatabaseConf appSettings)
+    return $ mkFoundation pool
+
+
+{-
+makeFoundation :: ApplicationSettings -> IO App
+makeFoundation appSettings = do
     appHttpManager <- getGlobalManager --from package "http-client-tls" , module Network.HTTP.Client.TLS
     appLogger <- newStdoutLoggerSet defaultBufSize >>= makeYesodLogger -- from "fast-logger", module System.Log.FastLogger
     appStatic <-
@@ -63,13 +85,16 @@ makeFoundation appSetting = do
             then staticDevel -- from "yesod-static", module Yesod.Static
             else static) -- from "yesod-static", module Yesod.Static
             (appStaticDir appSettings)
-        let mkFoundation appConnectionPoos = App {..} -- RecordWildCards
-            tempFoundation = mkFoundation $ error "Connection pool forced in tempFoundation"
+        let mkFoundation appConnectionPool = App {..}
+            tempFoundation =
+                mkFoundation $ error "Connection pool forced in tempFoundation"
             logFunc = messageLoggerSource tempFoundation appLogger
+
         pool <-
-            flip runLoggingT logFunc $ 
+            flip runLoggingT logFunc $
             createPostgresqlPool -- from "persistent-postgresql", module Database.Persist.Postgresql
                 (pgConnStr $ appDatabaseConf appSettings)
                 (pgPoolSize $ appDatabaseConf appSettings)
         return $ mkFoundation pool
+-}
 

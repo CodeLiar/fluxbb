@@ -2,7 +2,7 @@ name:    fluxbb
 version: "0.0.0"
 
 dependencies:
- aeson
+- aeson
 - base
 - classy-prelude-yesod
 - classy-prelude
