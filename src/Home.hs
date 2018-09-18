@@ -8,3 +8,6 @@ import Yesod.Core
 getHomeR :: Handler Html
 getHomeR = defaultLayout $ do
     setTitle "Minimal Multifile"
+    [whamlet|
+        <h4> Nice.
+    |]
