@@ -15,6 +15,7 @@ dependencies:
 - persistent
 - persistent-template
 - persistent-postgresql
+- shakespeare
 - template-haskell
 - yaml
 - yesod
