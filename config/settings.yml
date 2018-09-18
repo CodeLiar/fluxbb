@@ -1,0 +1,11 @@
+static-dir: "static"
+app-host: "*4"
+app-port: 3000
+development: false
+database-fonf:
+    user: "ibnu"
+    password: "jaran"
+    host: "localhost"
+    port: 5432
+    database: "fluxbb"
+    poolsize: 10

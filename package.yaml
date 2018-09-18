@@ -2,19 +2,27 @@ name:    fluxbb
 version: "0.0.0"
 
 dependencies:
+ aeson
 - base
-- yesod-core
 - classy-prelude-yesod
 - classy-prelude
 - esqueleto
+- fast-logger
+- file-embed
+- http-client
+- http-client-tls
 - monad-logger
 - persistent
 - persistent-template
 - persistent-postgresql
 - template-haskell
+- yaml
+- yesod
 - yesod-auth-hashdb
 - yesod-auth
+- yesod-core
 - yesod-form
+- yesod-static
 - wai
 - wai-extra
 - wai-logger

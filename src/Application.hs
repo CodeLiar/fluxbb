@@ -1,20 +1,28 @@
+{-# LANGUAGE MultiParamTypeClasses    #-}
 {-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE QuasiQuotes          #-}
+{-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE ViewPatterns         #-}
-{-# LANGUAGE QuasiQuotes          #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Application where
 
 import Control.Monad
 import Control.Monad.Logger
+import Database.Persist.Postgresql
 import Foundation
 import Language.Haskell.TH.Syntax
+import Network.HTTP.Client.TLS
 import Network.Wai.Handler.Warp
+import System.Log.FastLogger
 import Yesod.Core
+import Yesod.Default.Config2
+import Yesod.Static
 
 import Home
-import Settings     (ApplicationSettings (..))
+import Settings     (ApplicationSettings (..),
+                     configSettingsYmlValue)
 
 mkYesodDispatch "App" resourcesApp
 
@@ -41,7 +49,27 @@ makeApplication app = do
 
 newMain :: IO ()
 newMain = do
-    let app = undefined
+    settings <- loadYamlSettingsArgs [configSettingsYmlValue] useEnv
+    app <- makeFoundation settings
     commonapp <- makeApplication app
     runSettings (warpSettings app) commonapp
+
+makeFoundation :: ApplicationSettings -> IO App
+makeFoundation appSetting = do
+    appHttpManager <- getGlobalManager --from package "http-client-tls" , module Network.HTTP.Client.TLS
+    appLogger <- newStdoutLoggerSet defaultBufSize >>= makeYesodLogger -- from "fast-logger", module System.Log.FastLogger
+    appStatic <-
+        (if appMutableStatic appSettings
+            then staticDevel -- from "yesod-static", module Yesod.Static
+            else static) -- from "yesod-static", module Yesod.Static
+            (appStaticDir appSettings)
+        let mkFoundation appConnectionPoos = App {..} -- RecordWildCards
+            tempFoundation = mkFoundation $ error "Connection pool forced in tempFoundation"
+            logFunc = messageLoggerSource tempFoundation appLogger
+        pool <-
+            flip runLoggingT logFunc $ 
+            createPostgresqlPool -- from "persistent-postgresql", module Database.Persist.Postgresql
+                (pgConnStr $ appDatabaseConf appSettings)
+                (pgPoolSize $ appDatabaseConf appSettings)
+        return $ mkFoundation pool
 
