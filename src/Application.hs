@@ -3,7 +3,6 @@
 {-# LANGUAGE QuasiQuotes          #-}
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE TemplateHaskell      #-}
-{-# LANGUAGE ViewPatterns         #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Application where
@@ -21,6 +20,7 @@ import Yesod.Default.Config2
 import Yesod.Static
 
 import Home
+import Model
 import Settings     (ApplicationSettings (..),
                      configSettingsYmlValue)
 
@@ -96,5 +96,6 @@ makeFoundation appSettings = do
         createPostgresqlPool -- from "persistent-postgresql", module Database.Persist.Postgresql
             (pgConnStr $ appDatabaseConf appSettings)
             (pgPoolSize $ appDatabaseConf appSettings)
+    runLoggingT (runSqlPool (runMigration migrateAll) pool) logFunc
     return $ mkFoundation pool
 
