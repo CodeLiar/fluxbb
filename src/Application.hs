@@ -1,4 +1,5 @@
 {-# LANGUAGE MultiParamTypeClasses    #-}
+{-# LANGUAGE NoImplicitPrelude    #-}
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE QuasiQuotes          #-}
 {-# LANGUAGE RecordWildCards      #-}
@@ -7,15 +8,20 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Application where
 
+import ClassyPrelude.Yesod
+
 import Control.Monad
 import Control.Monad.Logger
 import Database.Persist.Postgresql
 import Foundation
 import Language.Haskell.TH.Syntax
 import Network.HTTP.Client.TLS
+import Network.Wai                              (Middleware)
 import Network.Wai.Handler.Warp
+import Network.Wai.Middleware.RequestLogger
 import System.Log.FastLogger
 import Yesod.Core
+import Yesod.Core.Types                         (loggerSet)
 import Yesod.Default.Config2
 import Yesod.Static
 
@@ -44,8 +50,9 @@ warpSettings app =
 
 makeApplication :: App -> IO Application
 makeApplication app = do
+    logware <- makeLogware app
     commonapp<- toWaiApp app
-    return $ defaultMiddlewaresNoLogging commonapp
+    return $ logware $ defaultMiddlewaresNoLogging commonapp
 
 newMain :: IO ()
 newMain = do
@@ -98,4 +105,30 @@ makeFoundation appSettings = do
             (pgPoolSize $ appDatabaseConf appSettings)
     runLoggingT (runSqlPool (runMigration migrateAll) pool) logFunc
     return $ mkFoundation pool
+
+makeLogware :: App -> IO Middleware
+makeLogware app = do
+    mkRequestLogger
+        def
+        { outputFormat =
+            if appDetailedRequestLogging $ appSettings app
+                then Detailed True
+                else Apache FromFallback
+        , destination = Logger $ loggerSet $ appLogger app
+        }
+
+-- DEVEL
+getAppSettings :: IO ApplicationSettings
+getAppSettings =loadYamlSettings [configSettingsYml] [] useEnv
+
+getAppDev :: IO (Settings, Application)
+getAppDev = do
+    settings <- getAppSettings
+    found <- makeFoundation settings
+    warpsettings <- getDevSettings $ warpSettings found
+    app <- makeApplication found
+    return (warpsettings, app)
+
+develMain :: IO ()
+develMain = develMainHelper getAppDev
 
