@@ -27,6 +27,7 @@ import Settings     (ApplicationSettings (..),
 import Handler.Home
 import Handler.Profile
 import Handler.Adm.Category
+import Handler.Adm.Forum
 
 mkYesodDispatch "App" resourcesApp
 

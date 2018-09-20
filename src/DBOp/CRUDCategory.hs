@@ -1,11 +1,12 @@
 {-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies      #-}
 
 module DBOp.CRUDCategory where
 
-import           Import
+import           Import                 hiding ((==.))
 import           Database.Esqueleto
 
 insertCategory ::
@@ -22,9 +23,26 @@ selectAllCategory ::
      , MonadIO m
      )
   => ReaderT b m [Entity Categories]
-selectAllCategory =
+selectAllCategory = do
   select $
-  from $ \category -> do
-    orderBy [asc (category ^. CategoriesName)]
-    return category
+    from $ \category -> do
+        orderBy [asc (category ^. CategoriesName)]
+        return category
+
+deleteCategory ::
+     ( BaseBackend backend ~ SqlBackend
+     , PersistQueryWrite backend
+     , BackendCompatible SqlBackend backend
+     , PersistUniqueRead backend
+     , MonadIO m
+     )
+  => Key Categories
+  -> ReaderT backend m ()
+deleteCategory cid = do
+  cat <-
+    select $
+    from $ \category -> do
+      where_ (category ^. CategoriesId ==. val cid)
+      return category
+  forM_ cat (deleteCascade . entityKey)
 

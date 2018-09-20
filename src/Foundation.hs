@@ -37,6 +37,7 @@ mkYesodData
     /auth                    SigninR             Auth getAuth
     /profile                 ProfileR            GET
     /admin/category          AdmCategoryR        GET POST
+    /admin/forum             AdmForumR           GET POST
   |]
 
 type Form a = Html -> MForm (HandlerFor App) (FormResult a, Widget)
@@ -105,6 +106,14 @@ instance YesodAuth App where
             Just (Entity uid _) -> return $ Authenticated uid
 
 instance YesodAuthPersist App
+
+allowedToAdmin :: Handler (Key Users, Text, Grouping)
+allowedToAdmin = do
+  midnamegroup <- getUserAndGrouping
+  case midnamegroup of
+    Nothing -> permissionDenied "You're not allowed to see this page."
+    (Just (uid, name, Administrator)) -> return (uid, name, Administrator)
+    (Just (uid, name, _)) -> permissionDenied "You're not the admin of this site."
 
 getUserAndGrouping :: Handler (Maybe (Key Users, Text, Grouping))
 getUserAndGrouping = do
