@@ -1,0 +1,14 @@
+<.container>
+  <.row>
+    <.column>
+    <.column.column-50>
+      <form action=@{action} method=post>
+        <fieldset>
+          <label for=username-field> Username
+          <input #username-field name=username placeholder="Your Username." type=text>
+          <label for=password-field> Password
+          <input #password-field name=password placeholder="Your Password." type=password>
+
+          <input .button-primary value=sign-in type=submit>
+    <.column>
+

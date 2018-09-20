@@ -97,7 +97,11 @@ instance YesodAuth App where
     loginDest _ = HomeR
     logoutDest _ = HomeR
     redirectToReferer _ = False
-    authPlugins _ = [authHashDB (Just . UniqueUsername)]
+    authPlugins _ = [authHashDBWithForm loginform (Just . UniqueUsername)]
+        where
+            loginform :: Route App -> Widget
+            loginform action = $(whamletFile "templates/login.hamlet")
+
     authenticate creds = liftHandler $ runDB $ do
         x <- getBy $ UniqueUsername $ credsIdent creds
         case x of
