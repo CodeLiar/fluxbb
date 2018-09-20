@@ -46,6 +46,7 @@ instance Yesod App where
         case appRoot $ appSettings app of
             Nothing -> getApprootText guessApproot app req
             Just root -> root
+    makeSessionBackend _ = Just <$> defaultClientSessionBackend (60 * 5) "config/client-session-key.aes"
     yesodMiddleware = defaultYesodMiddleware
     defaultLayout widget = do
         master <- getYesod
