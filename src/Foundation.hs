@@ -36,7 +36,7 @@ mkYesodData
     /static                  StaticR             Static appStatic
     /auth                    SigninR             Auth getAuth
     /profile                 ProfileR            GET
-    /admin/category          AdmCategoryR        GET
+    /admin/category          AdmCategoryR        GET POST
   |]
 
 type Form a = Html -> MForm (HandlerFor App) (FormResult a, Widget)

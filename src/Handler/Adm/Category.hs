@@ -30,13 +30,40 @@ selectCategoryForm cats =
     catlist =
       map (\(Entity cid (Categories name)) -> (name, fromSqlKey $ cid)) cats
 
+allowedToAdmin :: Handler (Key Users, Text, Grouping)
+allowedToAdmin = do
+  midnamegroup <- getUserAndGrouping
+  case midnamegroup of
+    Nothing -> permissionDenied "You're not allowed to see this page."
+    (Just (uid, name, Administrator)) -> return (uid, name, Administrator)
+    (Just (uid, name, _)) -> permissionDenied "You're not the admin of this site."
+
 getAdmCategoryR :: Handler Html
 getAdmCategoryR = do
+  (uid, name, group) <- allowedToAdmin
   (widc, enctc) <- generateFormPost createCategoryForm
+  allcategories <- getAllCategories
+  (widl, enctl) <- generateFormPost $ selectCategoryForm allcategories
   defaultLayout
     [whamlet|
-      <form enctype=#{enctc}>
+      <form method=post enctype=#{enctc}>
         ^{widc}
         <input .button-primary value=create type=submit>
+    <hr>
+      <form method=post enctype=#{enctl}>
+        ^{widl}
+        <input .button-primary value=delete type=submit>
     |]
+
+postAdmCategoryR :: Handler Html
+postAdmCategoryR = do
+  (uid, name, group) <- allowedToAdmin
+  ((res, _), _) <- runFormPost createCategoryForm
+  case res of
+    FormFailure x -> invalidArgs x
+    FormSuccess r -> do
+      _ <- createCategory group (createCategoryFormName r)
+      redirect AdmCategoryR
+    _ -> invalidArgs ["Good job, smarty pants!"]
+
 
