@@ -8,7 +8,6 @@
 
 module Foundation where
 
-import ClassyPrelude
 import ClassyPrelude.Yesod
 import Database.Persist.Sql
 import Network.HTTP.Client
@@ -36,6 +35,8 @@ mkYesodData
   "App"
   [parseRoutes|
     /                        HomeR               GET
+    /auth                    SigninR             Auth getAuth
+    /profile                 ProfileR            GET
   |]
 
 type Form a = Html -> MForm (HandlerFor App) (FormResult a, Widget)
@@ -50,17 +51,28 @@ instance Yesod App where
     yesodMiddleware = defaultYesodMiddleware
     defaultLayout widget = do
         master <- getYesod
+        maut <- maybeAuth
         mmessage <- getMessage
-        mcurrentroute <- getCurrentRoute
         pagecontent <- widgetToPageContent $ do
             [whamlet|
-                $maybe rout <- mcurrentroute
-                    <p>You're at ${show route}.
+                $maybe aut <- maut
+                    <a href=@{SigninR LogoutR}> Logout
                 $nothing
-                    <p>Apparently you're lost.
+                    <a href=@{SigninR LoginR}> Login
                 ^{widget}
             |]
         withUrlRenderer $(hamletFile "templates/wrapper.hamlet")
+    authRoute _ = Just $ SigninR LoginR
+    isAuthorized (SigninR _) _ = return Authorized
+    isAuthorized HomeR _       = return Authorized
+    isAuthorized ProfileR _    = isLoggedIn
+
+isLoggedIn :: Handler AuthResult
+isLoggedIn = do
+    maut <- maybeAuth
+    case maut of
+        Nothing -> return $ Unauthorized "login please"
+        Just _ -> return Authorized
 
 instance RenderMessage App FormMessage where
     renderMessage _ _ = defaultFormMessage

@@ -20,12 +20,14 @@ import Network.Wai                              (Middleware)
 import Network.Wai.Handler.Warp
 import Network.Wai.Middleware.RequestLogger
 import System.Log.FastLogger
+import Yesod.Auth
 import Yesod.Core
 import Yesod.Core.Types                         (loggerSet)
 import Yesod.Default.Config2
 import Yesod.Static
 
 import Home
+import Profile
 import Model
 import Settings     (ApplicationSettings (..),
                      configSettingsYmlValue)
