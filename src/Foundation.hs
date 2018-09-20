@@ -12,6 +12,7 @@ import ClassyPrelude.Yesod
 import Database.Persist.Sql
 import Network.HTTP.Client
 import Text.Hamlet
+import Text.Jasmine
 import Yesod.Auth
 import Yesod.Auth.HashDB
 import Yesod.Auth.Message
