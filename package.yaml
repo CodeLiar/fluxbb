@@ -10,6 +10,7 @@ dependencies:
 - esqueleto
 - fast-logger
 - file-embed
+- hjsmin
 - http-client
 - http-client-tls
 - monad-logger

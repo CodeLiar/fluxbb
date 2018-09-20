@@ -1,0 +1,261 @@
+body {
+    background-color: #d6d6d6;
+}
+.wrapper {
+    background-color: #d6d6d6;
+    color: #242424;
+    display: block;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.wrapper .container {
+    max-width: 90%;
+}
+
+.wrapper>.container {
+    padding-bottom: 7.5rem;
+    padding-top: 7.5rem
+}
+
+.header {
+    background-color: #444444;
+    padding-top: 1rem
+}
+
+@media(min-width:40rem) {
+    .header {
+        padding-top: 5rem
+    }
+}
+
+.header+section {
+    border-top: 0
+}
+
+.header .container {
+    border-top: 0;
+    padding-bottom: 7.5rem;
+    padding-top: 7.5rem;
+    position: relative;
+    text-align: center
+}
+
+.header .title {
+    font-family: Gotham Rounded A, Gotham Rounded B, Helvetica Neue, Arial, sans-serif
+}
+
+.header .img {
+    height: 15rem;
+    margin-bottom: 2rem
+}
+
+.header .img path {
+    animation: 7s a forwards;
+    fill: #f2f2f4;
+    stroke: #f2f2f4;
+    stroke-dasharray: 38321;
+    stroke-miterlimit: 10;
+    stroke-width: 15px
+}
+
+.header .button {
+    margin-bottom: 4rem;
+    margin-top: 2rem
+}
+
+@media(min-width:40rem) {
+    .header .button {
+        margin-bottom: 4rem;
+        margin-top: 2rem
+    }
+}
+
+@keyframes a {
+    0% {
+        fill-opacity: 0;
+        stroke-dashoffset: 38321
+    }
+    25% {
+        fill-opacity: 0;
+        stroke: #f2f2f4
+    }
+    to {
+        fill-opacity: 1;
+        stroke-dashoffset: 0
+    }
+}
+
+.navigation {
+    background: #464646;
+    border-bottom: .1rem solid #d1d1d1;
+    display: block;
+    height: 5.2rem;
+    left: 0;
+    max-width: 100%;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+    color: #f0f0f0;
+}
+
+.navigation .container {
+    padding-bottom: 0;
+    padding-top: 0
+}
+
+.navigation .navigation-list {
+    list-style: none;
+    margin-bottom: 0;
+    margin-right: 5rem
+}
+
+@media(min-width:80rem) {
+    .navigation .navigation-list {
+        margin-right: 0
+    }
+}
+
+.navigation .navigation-item {
+    float: left;
+    margin-bottom: 0;
+    margin-left: 2.5rem;
+    position: relative
+}
+
+.navigation .img {
+    fill: #f2f2f4;
+    height: 2rem;
+    position: relative;
+    top: .3rem
+}
+
+.navigation .navigation-title,
+.navigation .title {
+    color: #606c76;
+    font-family: Gotham Rounded A, Gotham Rounded B, Helvetica Neue, Arial, sans-serif;
+    position: relative
+}
+
+.navigation .navigation-link,
+.navigation .navigation-title,
+.navigation .title {
+    color: #f0f0f0;
+    display: inline;
+    font-size: 1.6rem;
+    line-height: 5.2rem;
+    padding: 0;
+    text-decoration: none
+}
+
+.navigation .navigation-link.active {
+    color: #606c76
+}
+
+@keyframes b {
+    0%,
+    50% {
+        transform: rotate(0)
+    }
+    25%,
+    75% {
+        transform: rotate(-25deg)
+    }
+}
+
+@media(min-width:40rem) {
+    .only-mobile {
+        display: none
+    }
+}
+
+.prettyprint.code {
+    border: 0;
+    border-left: .3rem solid #f2f2f4;
+    color: #655d5d
+}
+
+.prettyprint.code .str {
+    color: #4b8b8b
+}
+
+.prettyprint.code .kwd {
+    color: #8464c4
+}
+
+.prettyprint.code .com {
+    color: #adadad
+}
+
+.prettyprint.code .typ {
+    color: #7272ca
+}
+
+.prettyprint.code .lit {
+    color: #f2f2f4
+}
+
+.prettyprint.code .pun {
+    color: #5485b6
+}
+
+.prettyprint.code .clo,
+.prettyprint.code .opn {
+    color: #f4ecec
+}
+
+.prettyprint.code .atn,
+.prettyprint.code .tag {
+    color: #f2f2f4
+}
+
+.prettyprint.code .atv {
+    color: #5485b6
+}
+
+.prettyprint.code .dec {
+    color: #b45a3c
+}
+
+.prettyprint.code .var {
+    color: #ca4949
+}
+
+.prettyprint.code .fun {
+    color: #7272ca
+}
+
+.prettyprint.code.lang-md * {
+    color: #655d5d
+}
+
+.column.column-20 {
+    background-color: #d6d6d6;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+.banned {
+    text-align: center;
+    color: #f22424;
+}
+
+.locked {
+    text-align: center;
+    color: #aaafff;
+}
+
+.not-signed-in {
+    text-align: center;
+}
+

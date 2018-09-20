@@ -15,6 +15,8 @@ import Database.Persist.Postgresql
 import Language.Haskell.TH.Syntax
 import Network.Wai.Handler.Warp
 import Yesod.Default.Config2
+import Yesod.Default.Util
+import Yesod.Static
 
 data ApplicationSettings = ApplicationSettings
     { appStaticDir              :: String
@@ -49,3 +51,20 @@ configSettingsYmlBS = $(embedFile configSettingsYml) -- package "file-embed", mo
 
 configSettingsYmlValue :: Value
 configSettingsYmlValue = either Exception.throw id $ decodeEither' configSettingsYmlBS -- package "yaml", module Data.Yaml
+
+compileTimeAppSettings :: ApplicationSettings
+compileTimeAppSettings =
+  case fromJSON $ applyEnvValue False mempty configSettingsYmlValue of
+    Error e   -> error e
+    Success s -> s
+
+widgetFile :: String -> Q Exp
+widgetFile =
+  (if appReloadTemplate compileTimeAppSettings
+     then widgetFileReload
+     else widgetFileNoReload)
+    widgetFileSettings
+  where
+    widgetFileSettings :: WidgetFileSettings
+    widgetFileSettings = def
+

@@ -17,11 +17,13 @@ import Yesod.Auth.HashDB
 import Yesod.Auth.Message
 import Yesod.Core
 import Yesod.Core.Types
+import Yesod.Default.Util
 import Yesod.Form
 import Yesod.Static
 
 import Model
 import Settings
+import Settings.StaticFiles
 
 data App = App
     { appSettings :: ApplicationSettings
@@ -35,6 +37,7 @@ mkYesodData
   "App"
   [parseRoutes|
     /                        HomeR               GET
+    /static                  StaticR             Static appStatic
     /auth                    SigninR             Auth getAuth
     /profile                 ProfileR            GET
   |]
@@ -49,22 +52,33 @@ instance Yesod App where
             Just root -> root
     makeSessionBackend _ = Just <$> defaultClientSessionBackend (60 * 5) "config/client-session-key.aes"
     yesodMiddleware = defaultYesodMiddleware
+    addStaticContent ext mime content = do
+        yes <- getYesod
+        let statdir = appStaticDir $ appSettings yes
+        addStaticContentExternal
+            minifym
+            genFilename
+            statdir
+            (StaticR . flip StaticRoute [])
+            ext
+            mime
+            content
+        where
+            genFilename lbs = "autogen-" ++ base64md5 lbs
     defaultLayout widget = do
         master <- getYesod
         maut <- maybeAuth
         mmessage <- getMessage
         pagecontent <- widgetToPageContent $ do
-            [whamlet|
-                $maybe aut <- maut
-                    <a href=@{SigninR LogoutR}> Logout
-                $nothing
-                    <a href=@{SigninR LoginR}> Login
-                ^{widget}
-            |]
+            addStylesheet $ StaticR css_main_css
+            addStylesheet $ StaticR css_milligram_min_css
+            addStylesheet $ StaticR css_main_css
+            $(widgetFile "def")
         withUrlRenderer $(hamletFile "templates/wrapper.hamlet")
     authRoute _ = Just $ SigninR LoginR
     isAuthorized (SigninR _) _ = return Authorized
     isAuthorized HomeR _       = return Authorized
+    isAuthorized (StaticR _) _ = return Authorized
     isAuthorized ProfileR _    = isLoggedIn
 
 isLoggedIn :: Handler AuthResult
