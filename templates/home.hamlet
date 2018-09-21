@@ -14,7 +14,7 @@ $forall (category, forums) <- categoriesforindex
         <tr>
           <td>
             <strong>
-              <a href=#{fromSqlKey kf}> #{fname}
+              <a href=@{ForumR $ fromSqlKey kf}> #{fname}
               <span>
                 <small>
                   $maybe desc <- fdesc

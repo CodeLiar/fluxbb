@@ -4,6 +4,7 @@
 {-# LANGUAGE QuasiQuotes          #-}
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE TemplateHaskell      #-}
+{-# LANGUAGE ViewPatterns      #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Application where
@@ -27,7 +28,8 @@ import Settings     (ApplicationSettings (..),
 import Handler.Home
 import Handler.Profile
 import Handler.Adm.Category
-import Handler.Adm.Forum
+import Handler.Adm.Forum 
+import Handler.Forum
 
 mkYesodDispatch "App" resourcesApp
 

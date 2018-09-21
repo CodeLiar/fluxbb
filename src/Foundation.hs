@@ -5,6 +5,7 @@
 {-# LANGUAGE RankNTypes        #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeFamilies      #-}
+{-# LANGUAGE ViewPatterns      #-}
 
 module Foundation where
 
@@ -32,12 +33,14 @@ data App = App
 mkYesodData
   "App"
   [parseRoutes|
-    /                        HomeR               GET
-    /static                  StaticR             Static appStatic
-    /auth                    SigninR             Auth getAuth
-    /profile                 ProfileR            GET
-    /admin/category          AdmCategoryR        GET POST
-    /admin/forum             AdmForumR           GET POST
+    /                    HomeR        GET
+    /static              StaticR      Static appStatic
+    /auth                SigninR      Auth getAuth
+    /profile             ProfileR     GET
+    /admin/category      AdmCategoryR GET POST
+    /admin/forum         AdmForumR    GET POST
+    /forum/#Int64        ForumR       GET POST
+    /forum/#Int64/#Int64 ForumPageR   GET
   |]
 
 type Form a = Html -> MForm (HandlerFor App) (FormResult a, Widget)
@@ -77,7 +80,7 @@ instance Yesod App where
     isAuthorized (SigninR _) _ = return Authorized
     isAuthorized HomeR _       = return Authorized
     isAuthorized (StaticR _) _ = return Authorized
-    isAuthorized _ _    = isLoggedIn
+    isAuthorized _ _           = isLoggedIn
 
 isLoggedIn :: Handler AuthResult
 isLoggedIn = do
@@ -138,3 +141,11 @@ instance YesodPersist App where
     runDB action = do
         master <- getYesod
         runSqlPool action $ appConnectionPool master
+
+allowedToPost = do
+  midnamegroup <- getUserAndGrouping
+  case midnamegroup of
+    Nothing -> permissionDenied "You're not allowed to see this page."
+    (Just (uid, name, Banned)) -> permissionDenied "You're banned."
+    (Just (uid, name, _)) -> return (uid, name, Administrator)
+

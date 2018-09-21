@@ -19,6 +19,7 @@ dependencies:
 - persistent-postgresql
 - shakespeare
 - template-haskell
+- time
 - yaml
 - yesod
 - yesod-auth-hashdb

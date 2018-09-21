@@ -55,3 +55,34 @@ deleteForumById fid = do
     return forum
   forM_ forums (deleteCascade . entityKey)
 
+selectTopicsByForumIdPage ::
+     ( PersistUniqueRead backend
+     , PersistQueryRead backend
+     , BackendCompatible SqlBackend backend
+     , MonadIO m
+     )
+  => Key Forums
+  -> Int64
+  -> ReaderT backend m [Entity Topics]
+selectTopicsByForumIdPage fid page = do
+  select $
+    from $ \topic -> do
+      where_ (topic ^. TopicsForumId ==. val fid)
+      offset ((page - 1) * 25)
+      limit 25
+      return topic
+
+selectForumById ::
+     ( PersistUniqueRead backend
+     , PersistQueryRead backend
+     , BackendCompatible SqlBackend backend
+     , MonadIO m
+     )
+  => (Key Forums)
+  -> ReaderT backend m [Entity Forums]
+selectForumById fid = do
+  select $ from $ \forum -> do
+    where_ (forum ^. ForumsId ==. val fid)
+    limit 1
+    return forum
+

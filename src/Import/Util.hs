@@ -1,9 +1,11 @@
 module Import.Util
   ( forceTextToInt64
   , zip8
+  , timeZone
   ) where
 
 import           ClassyPrelude.Yesod
+import           Data.Time.LocalTime
 
 forceTextToInt64 :: Text -> Int64
 forceTextToInt64 t =
@@ -37,4 +39,7 @@ zipWith8 ::
 zipWith8 z (a:as) (b:bs) (c:cs) (d:ds) (e:es) (f:fs) (g:gs) (h:hs) =
   z a b c d e f g h : zipWith8 z as bs cs ds es fs gs hs
 zipWith8 z _ _ _ _ _ _ _ _ = []
+
+timeZone :: TimeZone
+timeZone = TimeZone 420 False "Jakarta"
 
