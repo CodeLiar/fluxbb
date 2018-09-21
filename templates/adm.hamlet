@@ -33,7 +33,7 @@
         <tr>
           <td> <a href=@{AdmBanR}> Bans
         <tr>
-          <td> <a href="#"}> Reports
+          <td> <a href=@{AdmReportR}> Reports
       <span>
       <span>
       $case group

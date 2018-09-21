@@ -31,6 +31,7 @@ import Handler.Adm
 import Handler.Adm.Category
 import Handler.Adm.Forum
 import Handler.Adm.Ban
+import Handler.Adm.Report
 import Handler.Adm.User
 import Handler.Forum
 import Handler.Topic

@@ -44,6 +44,7 @@ mkYesodData
     /admin/forum             AdmForumR           GET POST
     /admin/ban               AdmBanR             GET POST
     /admin/ban/options       AdmBanOptionsR      POST
+    /admin/report            AdmReportR          GET POST
     /admin/user              AdmUserR            GET POST
     /admin/user/promote      AdmUserPromoteR     POST
     /admin/user/promote/exe  AdmUserPromoteExeR  POST

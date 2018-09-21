@@ -1,0 +1,58 @@
+<h4> New Reports
+<form action=@{AdmReportR} method=post>
+  <table>
+    <thead>
+      <th> When
+      <th> Reported By
+      <th> Post
+      <th> Reason
+      <th>
+    <tbody>
+      $forall ((Entity rid (Reports pid tid fid rb c m z zb)), username, fname, tname) <- unzappedreports
+        <tr>
+          <td> #{show $ utcToLocalTime timeZone $ c}
+          <td>
+            <a href=@{UserR $ fromSqlKey rb}> #{username}
+          <td>
+            <a href=@{ForumR $ fromSqlKey fid}> #{fname}
+            <span> » 
+            <a href=@{TopicR $ fromSqlKey tid}> #{tname}
+            <span> »
+            <a href=@{PostR $ fromSqlKey pid}> Post ##{fromSqlKey pid}
+          <td> #{m}
+          <td>
+            <input name=report-id value=#{fromSqlKey rid} type=checkbox>
+  <input .button value=read type=submit>
+             
+<h4> Reviewed Reports
+<table>
+  <thead>
+    <th> When
+    <th> Reported By
+    <th> Post
+    <th> Reason
+    <th> Zapped At
+    <th> Zapped By
+  <tbody>
+    $forall ((Entity rid (Reports pid tid fid rb c m z zb)), username, fname, tname, by) <- zappedreports
+      <tr>
+        <td> #{show $ utcToLocalTime timeZone $ c}
+        <td>
+          <a href=@{UserR $ fromSqlKey rb}> #{username}
+        <td>
+          <a href=@{ForumR $ fromSqlKey fid}> #{fname}
+          <span> »
+          <a href=@{TopicR $ fromSqlKey tid}> #{tname}
+          <span> »
+          <a href=@{PostR $ fromSqlKey pid}> Post ##{fromSqlKey pid}
+        <td> #{m}
+        $maybe zat <- z
+          <td> #{show $ utcToLocalTime timeZone $ c}
+        $nothing
+          <td>
+        $maybe zid <- zb
+          <td>
+            <a href=@{UserR $ fromSqlKey zid}> #{by}
+        $nothing
+          <td>
+
