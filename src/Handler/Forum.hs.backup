@@ -10,7 +10,6 @@ import           Data.Time.LocalTime
 import           Database.Esqueleto
 
 import           Flux.Forum
-import           Handler.Topic
 
 data CreateTopicForm = CreateTopicForm
   { createTopicFormSubject :: Text

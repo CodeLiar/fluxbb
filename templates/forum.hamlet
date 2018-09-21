@@ -1,8 +1,8 @@
 <h4>
     <a href=@{HomeR}> Index
-    <span> » 
+    <span> »
     <a href=@{ForumR fid}> #{forumsName $ entityVal forum}
-<form action=@{ForumR fid} method=post> 
+<form action=@{ForumR fid} method=post>
   <table>
     <thead>
       <tr>
@@ -11,16 +11,16 @@
         <th width="20%"> Last Active
         $case group
           $of Administrator
-            <th width="10%"> Lock. 
+            <th width="10%"> Lock.
           $of Moderator
-            <th width="10%"> Lock. 
+            <th width="10%"> Lock.
           $of _
     <tbody>
       $forall (Entity key (Topics fid p s rc st lp lpid lposter lock)) <- topics
         <tr>
           <td>
             <strong>
-              <a href=@{HomeR}> #{s}
+              <a href=@{TopicR $ fromSqlKey key}> #{s}
               <span>
                 <small> by #{p}
           <td> #{rc}

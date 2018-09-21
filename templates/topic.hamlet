@@ -1,0 +1,23 @@
+<h4>
+  <a href=@{HomeR}> Index
+  <span> »
+  <a href=@{ForumR $ fromSqlKey $ entityKey forum}> #{forumsName $ entityVal forum}
+  <span> »
+  <a href=@{TopicR tid}> #{topicsSubject $ entityVal topic}
+
+$forall (Entity pid (Posts tid n uname uid t content)) <- posts
+  <.row.row-no-padding>
+    <.column.column-100>
+      <span>#{show $ utcToLocalTime timeZone $ t}
+      <span .float-right #post-#{n}> #{n}
+  <.row.row-no-padding>
+    <.column.column-20>
+      <a href=@{HomeR}> #{uname}
+    <.column.column-80>
+      <.row>
+        <.column.column-100> #{content}
+
+<form method=post action=@{TopicR tid} enctype=#{enct}>
+  ^{wid}
+  <input .button name=reply value=reply type=submit>
+

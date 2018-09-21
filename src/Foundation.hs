@@ -41,6 +41,8 @@ mkYesodData
     /admin/forum         AdmForumR    GET POST
     /forum/#Int64        ForumR       GET POST
     /forum/#Int64/#Int64 ForumPageR   GET
+    /topic/#Int64        TopicR       GET POST
+    /topic/#Int64/#Int64 TopicPageR   GET
   |]
 
 type Form a = Html -> MForm (HandlerFor App) (FormResult a, Widget)

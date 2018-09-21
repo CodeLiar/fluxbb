@@ -6,7 +6,8 @@
 
 module DBOp.CRUDForum where
 
-import           Import hiding (Value, groupBy, on, (==.))
+import           Import hiding (Value, groupBy, on, update, (+=.), (=.), (==.))
+
 
 import           Database.Esqueleto
 import           Database.Esqueleto.PostgreSQL
@@ -85,4 +86,22 @@ selectForumById fid = do
     where_ (forum ^. ForumsId ==. val fid)
     limit 1
     return forum
+updateForumIncrementReplyAndLasts ::
+     MonadIO m
+  => Key Forums
+  -> Text
+  -> Key Posts
+  -> UTCTime
+  -> ReaderT SqlBackend m ()
+updateForumIncrementReplyAndLasts fid username pid last = do
+  update $ \forum -> do
+    set
+      forum
+      [ ForumsRepliesCount +=. (val 1)
+      , ForumsLastPoster =. (val $ Just username)
+      , ForumsLastPostId =. (val $ Just pid)
+      , ForumsLastPost =. (val $ Just last)
+      ]
+    where_ (forum ^. ForumsId ==. val fid)
+
 
