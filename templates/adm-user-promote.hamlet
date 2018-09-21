@@ -2,7 +2,10 @@ $case group
   $of Administrator
     <form action=@{AdmUserPromoteExeR} method=post encttype=#{enct}>
       ^{wid}
-      <input .button name=promote value=ban type=submit>
+      $if ban
+        <input .button name=promote value=ban type=submit>
+      $else
+        <input .button name=promote value=promote type=submit>
   $of Moderator
     <form action=@{AdmUserPromoteExeR} method=post encttype=#{enct}>
       ^{wid}

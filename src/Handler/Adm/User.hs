@@ -12,6 +12,7 @@ import           Database.Esqueleto
 import           Flux.Miscellaneous
 import           Flux.User
 import           Flux.Adm.Ban
+import           Flux.Adm.User
 
 data SearchUserForm = SearchUserForm
   { searchUserFormGroupId  :: Maybe Int64
@@ -44,6 +45,21 @@ banUsersOptionsForm userid =
   renderDivs $ BanUsersOptionsForm
   <$> aopt textField "Message" Nothing
   <*> areq hiddenField "" (Just userid)
+
+data PromoteUsersForm = PromoteUsersForm
+  { promoteUsersFormGroupId :: Int64
+  , promoteUsersFormUserIds :: Text
+  } deriving (Show)
+
+promoteUsersForm :: [Entity Groups] -> Text -> Form PromoteUsersForm
+promoteUsersForm groups userids =
+  renderDivs $ PromoteUsersForm
+  <$> areq (selectFieldList glist) "Group" Nothing
+  <*> areq hiddenField "" (Just userids)
+  where
+    glist :: [(Text, Int64)]
+    glist =
+      map (\(Entity cid (Groups g)) -> (pack $ show g, fromSqlKey cid)) groups
 
 groupToHtml :: Grouping -> Html
 groupToHtml = toHtml . show
@@ -82,8 +98,20 @@ postAdmUserPromoteR = do
   case promote of
     Just "ban" -> do
       (uid, name, group) <- allowedToMod
+      let ban = True
       (wid, enct) <-
         generateFormPost $ banUsersOptionsForm $ intercalate "," userids
+      adminLayout uid name group $ do
+        setTitle "ban"
+        $(widgetFile "adm-user-promote")
+    Just "change" -> do
+      (uid, name, group) <- allowedToAdmin
+      let ban = False
+      mo <- getGroup Moderator
+      me <- getGroup Member
+      (wid, enct) <-
+        generateFormPost $
+        promoteUsersForm [mo, me] $ intercalate "," userids
       adminLayout uid name group $ do
         setTitle "Promote"
         $(widgetFile "adm-user-promote")
@@ -105,7 +133,19 @@ postAdmUserPromoteExeR = do
           forM_ userids $ \userid ->
             banUserById uid name group (toSqlKey userid) Nothing mes
           redirect $ AdmUserR
-    Just "change" -> do
-      error "Change"
+    Just "promote" -> do
+      (uid, name, group) <- allowedToAdmin
+      mo <- getGroup Moderator
+      me <- getGroup Member
+      ((res, _), _) <- runFormPost $ promoteUsersForm [mo, me] ""
+      case res of
+        FormSuccess r -> do
+          let (gid, userids) =
+                ( promoteUsersFormGroupId r
+                , map forceTextToInt64 $ splitOn "," $ promoteUsersFormUserIds r)
+          forM_ userids $ \userid ->
+            promoteUser uid name group (toSqlKey userid) (toSqlKey gid)
+          redirect AdmUserR
+        _ -> invalidArgs ["Please..."]
     _ -> invalidArgs ["Can't understand that."]
 

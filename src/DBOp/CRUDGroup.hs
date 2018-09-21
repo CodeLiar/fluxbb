@@ -74,3 +74,18 @@ selectAllGroups = do
       orderBy [asc (group ^. GroupsGrouping)]
       return group
 
+selectGroupByGroupId ::
+     ( PersistUniqueRead backend
+     , PersistQueryRead backend
+     , BackendCompatible SqlBackend backend
+     , MonadIO m
+     )
+  => Key Groups
+  -> ReaderT backend m [Entity Groups]
+selectGroupByGroupId gid = do
+  select $
+    from $ \group -> do
+      where_ (group ^. GroupsId ==. val gid)
+      limit 1
+      return group
+

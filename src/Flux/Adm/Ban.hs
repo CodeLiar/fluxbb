@@ -24,6 +24,18 @@ getAllBanneds ::
                       , Value Text)]
 getAllBanneds = liftHandler $ runDB $ selectAllBanneds
 
+banUser ::
+     ( YesodPersistBackend (HandlerSite m) ~ SqlBackend
+     , YesodPersist (HandlerSite m)
+     , MonadHandler m
+     )
+  => Key Users
+  -> p
+  -> Grouping
+  -> Text
+  -> Maybe Text
+  -> Maybe Text
+  -> m ()
 banUser execid execname execgroup username ip message = do
   gusername <- liftHandler $ runDB $ selectGroupByUsername username
   case gusername of
@@ -38,6 +50,18 @@ banUser execid execname execgroup username ip message = do
         (Right _, True)  -> invalidArgs ["You cannot ban yourself."]
         (Left x, _)      -> invalidArgs [x]
 
+banUserById ::
+     ( YesodPersistBackend (HandlerSite m) ~ SqlBackend
+     , YesodPersist (HandlerSite m)
+     , MonadHandler m
+     )
+  => Key Users
+  -> p
+  -> Grouping
+  -> Key Users
+  -> Maybe Text
+  -> Maybe Text
+  -> m ()
 banUserById execid execname execgroup userid ip message = do
   [user] <- liftHandler $ runDB $ selectUserById userid
   banUser execid execname execgroup (usersUsername $ entityVal user) ip message
@@ -48,7 +72,7 @@ unbanUser ::
      , MonadHandler m
      )
   => Key Users
-  -> p
+  -> Text
   -> Grouping
   -> Text
   -> m ()

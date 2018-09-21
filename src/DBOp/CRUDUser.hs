@@ -68,6 +68,16 @@ updateUserGroupingByUsername username grouping = do
     set user [UsersGroupId =. val (entityKey x)]
     where_ (user ^. UsersUsername ==. val username)
 
+selectUsersByConditions ::
+     ( PersistUniqueRead backend
+     , PersistQueryRead backend
+     , BackendCompatible SqlBackend backend
+     , MonadIO m
+     )
+  => Maybe (Key Groups)
+  -> Maybe Text
+  -> Maybe Text
+  -> ReaderT backend m [(Entity Users, Value Grouping)]
 selectUsersByConditions mgid musername memail = do
   select $
     from $ \(user, group) -> do
