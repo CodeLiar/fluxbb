@@ -4,7 +4,6 @@
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE TypeFamilies          #-}
-
 module DBOp.CRUDPost where
 
 import           Import                        hiding (Value, groupBy, on,
@@ -88,6 +87,7 @@ selectPostAndItsParentsInfo pid = do
         , topic ^. TopicsSubject
         , post)
 
+updatePostContent :: MonadIO m => Key Posts -> Text -> ReaderT SqlBackend m ()
 updatePostContent pid content = do
   update $ \post -> do
     set post [PostsContent =. val content]

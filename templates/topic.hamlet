@@ -23,7 +23,9 @@ $forall (Entity pid (Posts tid n uname posterid t content)) <- posts
           <a href=@{PostEditR $ fromSqlKey pid}> Edit
       $else
     <.column.column-10>
-      <span .float-right #post-#{n}> Report
+      <span .float-right #post-#{n}>
+        <a href=@{PostReportR $ fromSqlKey pid}> Report
+
 
 <form method=post action=@{TopicR tid} enctype=#{enct}>
   ^{wid}

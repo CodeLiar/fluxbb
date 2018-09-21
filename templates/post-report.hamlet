@@ -1,0 +1,15 @@
+<h4>
+  <a href=@{HomeR}> Index
+  <span> » 
+  <a href=@{ForumR $ fromSqlKey $ fid}> #{fname}
+  <span> » 
+  <a href=@{TopicR $ fromSqlKey $ tid}> #{tsub}
+  <span> » 
+  <a href=@{PostR pid}> This Post
+  <span> » 
+  <span> Your Complaints 
+
+<form action=@{PostReportR pid} method=post enctype=#{enct}>
+  ^{wid}
+  <input .button-primary name=edit value=report type=submit>
+

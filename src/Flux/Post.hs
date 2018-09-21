@@ -10,6 +10,7 @@ import           Import             hiding (Value)
 import           Database.Esqueleto
 import           DBOp.CRUDPost
 import           DBOp.CRUDTopic
+import           DBOp.CRUDReport
 
 getPostsInTopic ::
      ( BackendCompatible SqlBackend (YesodPersistBackend (HandlerSite m))
@@ -83,4 +84,20 @@ editPostByUidGroupAndContent _ Banned _ _ _ =
 editPostByUidGroupAndContent uid Member pid uid' content
   | uid /= uid' = permissionDenied "You're not allowed to edit this post."
   | otherwise = liftHandler $ runDB $ updatePostContent pid content
+
+createReport ::
+     ( BaseBackend (YesodPersistBackend (HandlerSite m)) ~ SqlBackend
+     , PersistStoreWrite (YesodPersistBackend (HandlerSite m))
+     , YesodPersist (HandlerSite m)
+     , MonadHandler m
+     )
+  => Key Posts
+  -> Key Topics
+  -> Key Forums
+  -> Key Users
+  -> Text
+  -> m ()
+createReport pid tid fid uid message = do
+  now <- liftIO getCurrentTime
+  liftHandler $ runDB $ insertReport pid tid fid uid now message Nothing Nothing
 

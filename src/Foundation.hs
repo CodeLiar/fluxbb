@@ -53,6 +53,7 @@ mkYesodData
     /topic/#Int64/#Int64     TopicPageR          GET
     /post/#Int64             PostR               GET
     /post/#Int64/edit        PostEditR           GET POST
+    /post/#Int64/report      PostReportR         GET POST
   |]
 
 type Form a = Html -> MForm (HandlerFor App) (FormResult a, Widget)
