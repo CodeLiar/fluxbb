@@ -30,6 +30,7 @@ getAdmForumR :: Handler Html
 getAdmForumR = do
   (u, n, g) <- allowedToAdmin
   allcategories <- getAllCategories
+  catfnamekeys <- getForumsAndItsCategory
   (wid, enct) <- generateFormPost $ createForumForm allcategories
   defaultLayout $ do
     [whamlet|
@@ -37,21 +38,45 @@ getAdmForumR = do
       <form method=post action=@{AdmForumR} enctype=#{enct}>
         ^{wid}
         <input .button-primary name=create value=create type=submit>
+            <h3> Delete Forums
+      <form method=post action=@{AdmForumR} enctype=#{enct}>
+        $forall (catname, fnamekeys) <- catfnamekeys
+          <h4> Category: #{catname}
+          <table>
+            <thead>
+              <th width="70%"> Name
+              <th> Delete
+            <tbody>
+              $forall (name, key) <- fnamekeys
+                <tr>
+                  <td> #{name}
+                  <td> <input name=delete-forum-id value=#{fromSqlKey key} type=checkbox>
+        <input .button-primary name=delete value=delete type=submit>
     |]
 
 postAdmForumR :: Handler Html
 postAdmForumR = do
   (u, n, g) <- allowedToAdmin
   allcategories <- getAllCategories
-  ((res, _), _) <- runFormPost $ createForumForm allcategories
-  case res of
-    FormFailure x -> invalidArgs x
-    FormSuccess r -> do
-      createForum
-        g
-        (toSqlKey $ createForumFormCategory r)
-        (createForumFormName r)
-        (unTextarea <$> createForumFormDesc r)
+  createparam <- lookupPostParam "create"
+  deleteparam <- lookupPostParam "delete"
+  case (createparam, deleteparam) of
+    (Nothing, Nothing) -> invalidArgs ["What do you want? Create or delete?"]
+    (Just _, Just _) -> invalidArgs ["What do you want? Create or delete?"]
+    (Just _, Nothing) -> do
+      ((res, _), _) <- runFormPost $ createForumForm allcategories
+      case res of
+        FormFailure x -> invalidArgs x
+        FormSuccess r -> do
+          createForum
+            g
+            (toSqlKey $ createForumFormCategory r)
+            (createForumFormName r)
+            (unTextarea <$> createForumFormDesc r)
+          redirect AdmForumR
+        _ -> invalidArgs ["Good job, smarty pants!"]
+    (Nothing, Just _) -> do
+      deletions <- lookupPostParams "delete-forum-id"
+      deleteForums g deletions
       redirect AdmForumR
-    _ -> invalidArgs ["Good job, smarty pants!"]
 
