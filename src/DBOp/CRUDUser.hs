@@ -12,6 +12,8 @@ import           Import             hiding (Value, groupBy, on, update, (+=.),
 
 import           Database.Esqueleto
 
+import           DBOp.CRUDGroup
+
 insertUser ::
      (BaseBackend backend ~ SqlBackend, PersistStoreWrite backend, MonadIO m)
   => Key Groups
@@ -57,4 +59,12 @@ selectUserByUsernameOrEmail username email = do
          val email)
       limit 1
       return user
+
+updateUserGroupingByUsername ::
+     MonadIO m => Text -> Grouping -> ReaderT SqlBackend m ()
+updateUserGroupingByUsername username grouping = do
+  [x] <- selectGroupByGrouping grouping
+  update $ \user -> do
+    set user [UsersGroupId =. val (entityKey x)]
+    where_ (user ^. UsersUsername ==. val username)
 

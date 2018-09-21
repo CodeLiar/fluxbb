@@ -64,12 +64,23 @@ getPostParentInformation pid = do
     []  -> notFound
     x:_ -> return x
 
+editPostByUidGroupAndContent ::
+     ( YesodPersistBackend (HandlerSite m) ~ SqlBackend
+     , YesodPersist (HandlerSite m)
+     , MonadHandler m
+     )
+  => Key Users
+  -> Grouping
+  -> Key Posts
+  -> Key Users
+  -> Text
+  -> m ()
 editPostByUidGroupAndContent _ group pid _ content
   | group == Administrator || group == Moderator =
     liftHandler $ runDB $ updatePostContent pid content
 editPostByUidGroupAndContent _ Banned _ _ _ =
   permissionDenied "Bruh... You've been banned. Please..."
-editPostByUidGroupAndContent uid _ pid uid' content
+editPostByUidGroupAndContent uid Member pid uid' content
   | uid /= uid' = permissionDenied "You're not allowed to edit this post."
   | otherwise = liftHandler $ runDB $ updatePostContent pid content
 

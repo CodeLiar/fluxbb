@@ -4,7 +4,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Flux.AdmCategory where
+module Flux.Adm.Category where
 
 import           Import
 

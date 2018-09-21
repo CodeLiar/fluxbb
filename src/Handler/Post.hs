@@ -49,7 +49,7 @@ postPostEditR pid = do
       editPostByUidGroupAndContent
         uid
         group
-        (toSqlKey pid )
+        (toSqlKey pid)
         (postsUserId $ entityVal post)
         (unTextarea $ editPostFormContent c)
       redirect $ PostR pid

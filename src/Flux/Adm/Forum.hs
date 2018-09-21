@@ -5,7 +5,7 @@
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RankNTypes #-}
 
-module Flux.AdmForum where
+module Flux.Adm.Forum where
 
 import           Import         hiding (Value)
 

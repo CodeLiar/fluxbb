@@ -36,8 +36,10 @@ postTopicR tid = do
       redirect $ TopicPageR tid page :#: ("post-" <> show num)
     _ -> defaultLayout [whamlet|Please.|]
 
-canEdit uid puid group =
-  uid == puid || group == Administrator || group == Moderator
+canEdit :: Key Users -> Key Users -> Grouping -> Bool
+canEdit uid posterid group =
+  uid == posterid || group == Administrator || group == Moderator
+
 
 getTopicPageR :: Int64 -> Int64 -> Handler Html
 getTopicPageR tid page = do

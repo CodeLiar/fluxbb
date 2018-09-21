@@ -15,7 +15,7 @@ data RegisterForm = RegisterForm
   { registerFormUsername :: Text
   , registerFormPassword :: Text
   , registerFormEmail    :: Text
-  } deriving (Show)
+  }
 
 registerForm :: Form RegisterForm
 registerForm =
@@ -45,23 +45,19 @@ postRegisterR = do
     _ ->
       invalidArgs
         [ "Your input doesn't contribute sufficiently"
-        , " for this capitalistic society. Think about it."
+        , " For this capitalistic society. Think about it."
         ]
 
 getProfileR :: Handler Html
 getProfileR = do
-  (Just (Entity userid user)) <- maybeAuth
-  defaultLayout $ do
-    setTitle "Nice"
-    [whamlet|
-      <p> You are: #{usersUsername user}
-      <p> Userid: #{fromSqlKey userid}
-      <p> Your email: #{usersEmail user}
-    |]
+  (ruid, name, group) <- allowedToPost
+  user'@(Entity uid' user) <- getUserById  ruid
+  profileLayout ruid name group user' $(widgetFile "profile-info")
 
 getUserR :: Int64 -> Handler Html
 getUserR uid = do
   (ruid, name, group) <- allowedToPost
-  (Entity uid' user ) <- getUserById $ toSqlKey uid
-  defaultLayout $(widgetFile "profile")
+  user'@(Entity uid' user) <- getUserById $ toSqlKey uid
+  profileLayout ruid name group user' $(widgetFile "profile-info")
+
 

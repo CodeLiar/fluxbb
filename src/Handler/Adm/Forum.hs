@@ -7,8 +7,8 @@ import           Import
 
 import           Database.Esqueleto
 
-import           Flux.AdmCategory
-import           Flux.AdmForum
+import           Flux.Adm.Category
+import           Flux.Adm.Forum
 
 data CreateForumForm = CreateForumForm
   { createForumFormName     :: Text
@@ -32,7 +32,7 @@ getAdmForumR = do
   allcategories <- getAllCategories
   catfnamekeys <- getForumsAndItsCategory
   (wid, enct) <- generateFormPost $ createForumForm allcategories
-  defaultLayout $ do
+  adminLayout u n g $ do
     $(widgetFile "adm-forum")
 
 postAdmForumR :: Handler Html
