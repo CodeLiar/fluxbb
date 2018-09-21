@@ -1,6 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE TemplateHaskell       #-}
 module Handler.Adm.Forum where
 
 import           Import
@@ -33,26 +33,7 @@ getAdmForumR = do
   catfnamekeys <- getForumsAndItsCategory
   (wid, enct) <- generateFormPost $ createForumForm allcategories
   defaultLayout $ do
-    [whamlet|
-      <h3> Create Forum
-      <form method=post action=@{AdmForumR} enctype=#{enct}>
-        ^{wid}
-        <input .button-primary name=create value=create type=submit>
-            <h3> Delete Forums
-      <form method=post action=@{AdmForumR} enctype=#{enct}>
-        $forall (catname, fnamekeys) <- catfnamekeys
-          <h4> Category: #{catname}
-          <table>
-            <thead>
-              <th width="70%"> Name
-              <th> Delete
-            <tbody>
-              $forall (name, key) <- fnamekeys
-                <tr>
-                  <td> #{name}
-                  <td> <input name=delete-forum-id value=#{fromSqlKey key} type=checkbox>
-        <input .button-primary name=delete value=delete type=submit>
-    |]
+    $(widgetFile "adm-forum")
 
 postAdmForumR :: Handler Html
 postAdmForumR = do
@@ -61,8 +42,6 @@ postAdmForumR = do
   createparam <- lookupPostParam "create"
   deleteparam <- lookupPostParam "delete"
   case (createparam, deleteparam) of
-    (Nothing, Nothing) -> invalidArgs ["What do you want? Create or delete?"]
-    (Just _, Just _) -> invalidArgs ["What do you want? Create or delete?"]
     (Just _, Nothing) -> do
       ((res, _), _) <- runFormPost $ createForumForm allcategories
       case res of
@@ -79,4 +58,5 @@ postAdmForumR = do
       deletions <- lookupPostParams "delete-forum-id"
       deleteForums g deletions
       redirect AdmForumR
+    _ -> invalidArgs ["What do you want? Create or delete?"]
 

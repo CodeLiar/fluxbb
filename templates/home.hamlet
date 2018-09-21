@@ -1,0 +1,36 @@
+$forall (category, forums) <- categoriesforindex
+  <h4>
+    <strong> #{category}
+  <table>
+    <thead>
+      <tr>
+        <th width="40%"> Name
+        <th width="10%"> Topics
+        <th width="10%"> Replies
+        <th width="20%"> Last Active
+        <th width="10%"> Last Poster
+    <tbody>
+      $forall (kf, fname, fdesc, ftop, frep, flp, flpid, flposter) <- forums
+        <tr>
+          <td>
+            <strong>
+              <a href=#{fromSqlKey kf}> #{fname}
+              <span>
+                <small>
+                  $maybe desc <- fdesc
+                    #{desc}
+                  $nothing
+          <td> #{ftop}
+          <td> #{frep}
+          $maybe lastpost <- flp
+            $maybe lastpostid <- flpid
+              <td> <a href=#{fromSqlKey lastpostid}> #{show lastpost}
+            $nothing
+              <td> Never
+          $nothing
+            <td> Nothing
+          $maybe lastposter <- flposter
+            <td> #{lastposter}
+          $nothing
+            <td> Never
+

@@ -1,0 +1,8 @@
+<form method=post enctype=#{enctc}>
+  ^{widc}
+  <input .button-primary name=create value=create type=submit>
+<hr>
+<form method=post enctype=#{enctl}>
+  ^{widl}
+  <input .button-primary name=delete value=delete type=submit>
+

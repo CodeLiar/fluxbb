@@ -1,0 +1,18 @@
+<h3> Create Forum
+<form method=post action=@{AdmForumR} enctype=#{enct}>
+  ^{wid}
+  <input .button-primary name=create value=create type=submit>
+<h3> Delete Forums
+<form method=post action=@{AdmForumR} enctype=#{enct}>
+  $forall (catname, fnamekeys) <- catfnamekeys
+    <h4> Category: #{catname}
+    <table>
+      <thead>
+        <th width="70%"> Name
+        <th> Delete
+      <tbody>
+        $forall (name, key) <- fnamekeys
+          <tr>
+            <td> #{name}
+            <td> <input name=delete-forum-id value=#{fromSqlKey key} type=checkbox>
+  <input .button-primary name=delete value=delete type=submit> 
