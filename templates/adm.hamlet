@@ -1,0 +1,54 @@
+<nav .navigation>
+  <section .container>
+    <ul .navigation-list.float-left>
+      <li .navigation-item>
+        <a .navigation-link href=@{HomeR}> Home
+      <li .navigation-item>
+        <a .navigation-link href=@{AdmR} title="Management"> Management
+      <li .navigation-item>
+        <a .navigation-link href="#" title="Users"> Users
+    <ul .navigation-list.float-right>
+      <li .navigation-item>
+        <a .navigation-link href=@{ProfileR}> Profile
+      <li .navigation-item>
+        <a .navigation-link href=@{SigninR LogoutR}> Logout
+<.container>
+  <h4>
+      <a href=@{HomeR}> Index
+      <span> »
+      <a href=@{AdmR}> Management
+      $maybe route <- mcurrentroute
+        <span> »
+        <a href=@{route}> #{adminRouteToText route}
+      $nothing
+  <.row>
+    <.column.column-20>
+      <table>
+        <tr>
+          <thead> <h5> Moderation
+        <tr>
+          <td> <a href=@{AdmR}> Index
+        <tr>
+          <td> <a href="#"}> Users
+        <tr>
+          <td> <a href=@{AdmBanR}> Bans
+        <tr>
+          <td> <a href="#"}> Reports
+      <span>
+      <span>
+      $case group
+        $of Administrator
+          <table>
+            <tr>
+              <thead> <h5> Admin Menu
+            <tr>
+              <td> <a href=@{AdmCategoryR}> Categories
+            <tr>
+              <td> <a href=@{AdmForumR}> Forums
+        $of _
+    <.column.column-75.column-offset-5>
+      $maybe message <- mmessage
+        #{message}
+      $nothing
+      ^{widget}
+

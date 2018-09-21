@@ -1,0 +1,7 @@
+<h3> Ban User
+<.row>
+  <.column.column-100>
+    <form action=@{AdmBanR} method=post encttype=#{enct}>
+      ^{wid}
+      <input .button name=ban value=ban type=submit>
+

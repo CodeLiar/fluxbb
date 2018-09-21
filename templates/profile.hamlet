@@ -1,26 +1,66 @@
-<.row>
-  <.column>
-    <p> Username:
-  <.column.column-75>
-    <p> #{usersUsername user}
-<.row>
-  <.column>
-    <p> Email:
-  <.column.column-75>
-    <p> #{usersEmail user}
-<.row>
-  <.column>
-    <p> Join Date:
-  <.column.column-75>
-    <p> #{show $ utcToLocalTime timeZone $ usersJoinTime user}
-<.row>
-  <.column>
-    <p> Topics Started:
-  <.column.column-75>
-    <p> #{usersTopicsStarted user}
-<.row>
-  <.column>
-    <p> Replies Posted:
-  <.column.column-75>
-    <p> #{usersRepliesPosted user}
+<nav .navigation>
+  <section .container>
+    <ul .navigation-list.float-left>
+      <li .navigation-item>
+        <a .navigation-link href=@{HomeR}> Index
+      $case group
+        $of Administrator
+          <li .navigation-item>
+            <a .navigation-link href=@{AdmR} title="Management"> Management
+          <li .navigation-item>
+            <a .navigation-link href="#" title="Users"> Users
+        $of Moderator
+          <li .navigation-item>
+            <a .navigation-link href=@{AdmR} title="Management"> Management
+          <li .navigation-item>
+            <a .navigation-link href="#" title="Users"> Users
+        $of Member
+          <li .navigation-item>
+            <a .navigation-link href="#" title="Users"> Users
+        $of Banned
+    <ul .navigation-list.float-right>
+      <li .navigation-item>
+        <a .navigation-link href=@{ProfileR}> Profile
+      <li .navigation-item>
+        <a .navigation-link href=@{SigninR LogoutR}> Logout
+<.container>
+  $case group
+    $of Banned
+      <h2 .banned> You're banned.
+    $of _
+      <h4>
+          <a href="#"> Users
+          <span> »
+          <a href="#"> #{usersUsername $ entityVal user}
+          $maybe route <- mcurrentroute
+            <span> »
+            <a href=@{route}> #{profileRouteToText route}
+          $nothing
+      <.row>
+        $if allowededit
+          <.column.column-20>
+            <table>
+              <tr>
+                <thead> <h5> Profile Menu
+              <tr>
+                <td> <a href="#"> Edit Essentials
+                $case group
+                  $of Administrator
+                    <tr>
+                      <td> <a href="#"> Administration
+                  $of Moderator
+                    <tr>
+                      <td> <a href="#"> Administration
+                  $of _
+          <.column.column-75.column-offset-5>
+            $maybe message <- mmessage
+              #{message}
+            $nothing
+            ^{widget}
+        $else
+          <.column.column-100>
+            $maybe message <- mmessage
+              #{message}
+            $nothing
+            ^{widget}
 

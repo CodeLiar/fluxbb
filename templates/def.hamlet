@@ -3,8 +3,19 @@
     <ul .navigation-list.float-left>
       <li .navigation-item>
         <a .navigation-link href=@{HomeR}> Home
+      $maybe (uid, name, group) <- muidnamegroup
+        $case group
+          $of Administrator
+            <li .navigation-item>
+              <a .navigation-link href=@{AdmR}> Administration
+          $of Administrator
+            <li .navigation-item>
+              <a .navigation-link href=@{AdmR}> Administration
+          $of Member
+          $of Banned
+        
     <ul .navigation-list.float-right>
-      $maybe aut <- maut
+      $maybe aut <- muidnamegroup
         <li .navigation-item>
           <a .navigation-link href=@{ProfileR}> Profile
         <li .navigation-item>
@@ -15,5 +26,8 @@
         <li .navigation-item>
           <a .navigation-link href=@{SigninR LoginR}> Login
 <section .container>
+  $maybe message <- mmessage
+    #{message}
+  $nothing
   ^{widget}
 
