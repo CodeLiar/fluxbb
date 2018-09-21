@@ -1,0 +1,26 @@
+<.row>
+  <.column>
+    <p> Username:
+  <.column.column-75>
+    <p> #{usersUsername user}
+<.row>
+  <.column>
+    <p> Email:
+  <.column.column-75>
+    <p> #{usersEmail user}
+<.row>
+  <.column>
+    <p> Join Date:
+  <.column.column-75>
+    <p> #{show $ utcToLocalTime timeZone $ usersJoinTime user}
+<.row>
+  <.column>
+    <p> Topics Started:
+  <.column.column-75>
+    <p> #{usersTopicsStarted user}
+<.row>
+  <.column>
+    <p> Replies Posted:
+  <.column.column-75>
+    <p> #{usersRepliesPosted user}
+

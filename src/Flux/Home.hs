@@ -28,9 +28,9 @@ getCategoriesForIndex ::
                          , Maybe Text)])]
 getCategoriesForIndex = do
   categoriesandforums <- liftHandler $ runDB $ selectCategoriesForIndex
-  return $ map anu categoriesandforums
+  return $ map catNZip8 categoriesandforums
   where
-    anu s =
+    catNZip8 s =
       case s of
         (a, Just b, Just c, Just d, Just e, Just f, Just g, Just h, Just i) ->
           (a, zip8 b c d e f g h i)

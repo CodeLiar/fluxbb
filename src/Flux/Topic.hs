@@ -12,7 +12,7 @@ import           DBOp.CRUDForum
 import           DBOp.CRUDPost
 import           DBOp.CRUDTopic
 
-import           Handler.Profile
+import           Handler.User
 
 getTopicById ::
      ( BackendCompatible SqlBackend (YesodPersistBackend (HandlerSite m))

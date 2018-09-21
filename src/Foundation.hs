@@ -36,7 +36,9 @@ mkYesodData
     /                    HomeR        GET
     /static              StaticR      Static appStatic
     /auth                SigninR      Auth getAuth
+    /register            RegisterR    GET POST
     /profile             ProfileR     GET
+    /user/#Int64         UserR        GET
     /admin/category      AdmCategoryR GET POST
     /admin/forum         AdmForumR    GET POST
     /forum/#Int64        ForumR       GET POST
@@ -83,6 +85,7 @@ instance Yesod App where
     authRoute _ = Just $ SigninR LoginR
     isAuthorized (SigninR _) _ = return Authorized
     isAuthorized HomeR _       = return Authorized
+    isAuthorized RegisterR _   = return Authorized
     isAuthorized (StaticR _) _ = return Authorized
     isAuthorized _ _           = isLoggedIn
 
@@ -121,6 +124,13 @@ allowedToAdmin = do
     Nothing -> permissionDenied "You're not allowed to see this page."
     (Just (uid, name, Administrator)) -> return (uid, name, Administrator)
     (Just (uid, name, _)) -> permissionDenied "You're not the admin of this site."
+
+isNotLoggedIn :: Handler ()
+isNotLoggedIn = do
+  maut <- maybeAuth
+  case maut of
+    Nothing -> return ()
+    Just _  -> redirect $ HomeR
 
 getUserAndGrouping :: Handler (Maybe (Key Users, Text, Grouping))
 getUserAndGrouping = do

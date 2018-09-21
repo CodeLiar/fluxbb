@@ -26,7 +26,7 @@ import Settings     (ApplicationSettings (..),
                      configSettingsYmlValue)
 
 import Handler.Home
-import Handler.Profile
+import Handler.User
 import Handler.Adm.Category
 import Handler.Adm.Forum
 import Handler.Forum

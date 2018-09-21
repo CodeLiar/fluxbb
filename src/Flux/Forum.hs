@@ -44,8 +44,7 @@ getTopicsInForum fid page | page < 1 = invalidArgs ["Yo! Have you seen negative 
 getTopicsInForum fid page = liftHandler $ runDB $ selectTopicsByForumIdPage fid page
 
 createTopicByPosting ::
-     ( BaseBackend (YesodPersistBackend (HandlerSite m)) ~ SqlBackend
-     , PersistStoreWrite (YesodPersistBackend (HandlerSite m))
+     ( YesodPersistBackend (HandlerSite m) ~ SqlBackend
      , YesodPersist (HandlerSite m)
      , MonadHandler m
      )
@@ -58,7 +57,9 @@ createTopicByPosting ::
 createTopicByPosting fid userid username subject content = do
   now <- liftIO getCurrentTime
   tid <- liftHandler $ runDB $ insertTopic fid username subject
-  pid <- liftHandler $ runDB $ insertPost tid 1 username userid content
+  liftHandler $ runDB $ do
+    _ <- insertPost tid 1 username userid content
+    updateForumIncrementTopic fid
   return tid
 
 lockUnlockTopic ::

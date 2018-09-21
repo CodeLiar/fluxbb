@@ -3,7 +3,6 @@
     <ul .navigation-list.float-left>
       <li .navigation-item>
         <a .navigation-link href=@{HomeR}> Home
-        
     <ul .navigation-list.float-right>
       $maybe aut <- maut
         <li .navigation-item>
@@ -11,6 +10,8 @@
         <li .navigation-item>
           <a .navigation-link href=@{SigninR LogoutR}> Logout
       $nothing
+        <li .navigation-item>
+          <a .navigation-link href=@{RegisterR}> Register
         <li .navigation-item>
           <a .navigation-link href=@{SigninR LoginR}> Login
 <section .container>
