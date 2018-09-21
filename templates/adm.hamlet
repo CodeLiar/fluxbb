@@ -29,7 +29,7 @@
         <tr>
           <td> <a href=@{AdmR}> Index
         <tr>
-          <td> <a href="#"}> Users
+          <td> <a href=@{AdmUserR}}> Users
         <tr>
           <td> <a href=@{AdmBanR}> Bans
         <tr>

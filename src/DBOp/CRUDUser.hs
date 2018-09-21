@@ -68,3 +68,17 @@ updateUserGroupingByUsername username grouping = do
     set user [UsersGroupId =. val (entityKey x)]
     where_ (user ^. UsersUsername ==. val username)
 
+selectUsersByConditions mgid musername memail = do
+  select $
+    from $ \(user, group) -> do
+      where_
+        (    qbuilder user UsersGroupId mgid
+         &&. qbuilder user UsersUsername musername
+         &&. qbuilder user UsersEmail memail
+         &&. user ^. UsersGroupId ==. group ^. GroupsId)
+      orderBy [asc (user ^. UsersUsername)]
+      return (user, group ^. GroupsGrouping)
+  where
+    qbuilder _ _ Nothing = (val True)
+    qbuilder user accessor (Just v) = (user ^. accessor ==. val v)
+

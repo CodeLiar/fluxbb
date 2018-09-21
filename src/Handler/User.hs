@@ -50,9 +50,9 @@ postRegisterR = do
 
 getProfileR :: Handler Html
 getProfileR = do
-  (ruid, name, group) <- allowedToPost
-  user'@(Entity uid' user) <- getUserById  ruid
-  profileLayout ruid name group user' $(widgetFile "profile-info")
+  (uid, _, _) <- allowedToPost
+  redirect $ UserR $ fromSqlKey uid
+
 
 getUserR :: Int64 -> Handler Html
 getUserR uid = do

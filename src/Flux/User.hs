@@ -7,6 +7,7 @@ module Flux.User where
 
 import           Import
 
+import           Database.Esqueleto
 import           Yesod.Auth.Util.PasswordStore
 
 import           DBOp.CRUDGroup
@@ -26,7 +27,7 @@ unusedUser username email = do
   users <- liftHandler $ runDB $ selectUserByUsernameOrEmail username email
   case users of
     [] -> return ()
-    _ -> invalidArgs ["Username and/or email has been used."]
+    _  -> invalidArgs ["Username and/or email has been used."]
 
 getUserById ::
      ( BackendCompatible SqlBackend (YesodPersistBackend (HandlerSite m))
@@ -40,7 +41,7 @@ getUserById ::
 getUserById uid = do
   users <- liftHandler $ runDB $ selectUserById uid
   case users of
-    [] -> notFound
+    []  -> notFound
     x:_ -> return x
 
 registerUser ::
@@ -61,7 +62,7 @@ registerUser username password email = do
   now <- liftIO getCurrentTime
   gids <- liftHandler $ runDB $ selectGroupByGrouping Member
   case gids of
-    [] -> invalidArgs ["Call the Administrator"]
+    []  -> invalidArgs ["Call the Administrator"]
     x:_ -> do
       password' <- liftIO $ makePassword (encodeUtf8 password) 17
       liftHandler $
@@ -72,4 +73,9 @@ registerUser username password email = do
           (Just $ decodeUtf8 password')
           email
           now
+
+getUsersByConditions mgid musername memail = do
+  userandgroup <-
+    liftHandler $ runDB $ selectUsersByConditions mgid musername memail
+  return $ map (\(user, Value group) -> (user, group)) userandgroup
 

@@ -44,3 +44,16 @@ selectGroupByUsername username = do
       limit 1
       return (user ^. UsersId, group ^. GroupsId, group ^. GroupsGrouping)
 
+selectAllGroups ::
+     ( PersistUniqueRead backend
+     , PersistQueryRead backend
+     , BackendCompatible SqlBackend backend
+     , MonadIO m
+     )
+  => ReaderT backend m [Entity Groups]
+selectAllGroups = do
+  select $
+    from $ \group -> do
+      orderBy [asc (group ^. GroupsGrouping)]
+      return group
+

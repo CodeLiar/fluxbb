@@ -1,0 +1,35 @@
+<h4> Search User
+<form action=@{AdmUserR} method=post enctype=#{enct}>
+  ^{wid}
+  <input .button name=search value=search type=submit>
+
+<h4> Result
+<form action="#" method=post enctype=#{enct}>
+  <table>
+    <thead>
+      <th> Username
+      <th> Email
+      <th> Status
+      <th> Posts
+      <th> Actions
+      <th> Select
+    <tbody>
+      $forall (user, g) <- users
+        <tr>
+          <td>
+            <a href=@{UserR $ fromSqlKey $ entityKey user}> #{usersUsername $ entityVal user}
+          <td> #{usersEmail $ entityVal user}
+          <td> #{groupToHtml g}
+          <td> #{usersRepliesPosted $ entityVal user}
+          <td>
+            <a href="#"> Show posts
+          <td>
+            <input name=user-id value=#{fromSqlKey $ entityKey user} type=checkbox>
+  $case group
+    $of Administrator
+      <input .button name=promote value=ban type=submit>
+      <input .button name=promote value=change type=submit>
+    $of Moderator
+      <input .button name=promote value=ban type=submit>
+    $of _
+

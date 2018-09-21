@@ -8,7 +8,7 @@
           $of Administrator
             <li .navigation-item>
               <a .navigation-link href=@{AdmR}> Administration
-          $of Administrator
+          $of Moderator
             <li .navigation-item>
               <a .navigation-link href=@{AdmR}> Administration
           $of Member
