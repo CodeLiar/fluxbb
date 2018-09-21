@@ -33,24 +33,26 @@ data App = App
 mkYesodData
   "App"
   [parseRoutes|
-    /                    HomeR          GET
-    /static              StaticR        Static appStatic
-    /auth                SigninR        Auth getAuth
-    /register            RegisterR      GET POST
-    /profile             ProfileR       GET
-    /user/#Int64         UserR          GET
-    /admin               AdmR           GET
-    /admin/category      AdmCategoryR   GET POST
-    /admin/forum         AdmForumR      GET POST
-    /admin/ban           AdmBanR        GET POST
-    /admin/ban/options   AdmBanOptionsR POST
-    /admin/user          AdmUserR       GET POST
-    /forum/#Int64        ForumR         GET POST
-    /forum/#Int64/#Int64 ForumPageR     GET
-    /topic/#Int64        TopicR         GET POST
-    /topic/#Int64/#Int64 TopicPageR     GET
-    /post/#Int64         PostR          GET
-    /post/#Int64/edit    PostEditR      GET POST
+    /                        HomeR               GET
+    /static                  StaticR             Static appStatic
+    /auth                    SigninR             Auth getAuth
+    /register                RegisterR           GET POST
+    /profile                 ProfileR            GET
+    /user/#Int64             UserR               GET
+    /admin                   AdmR                GET
+    /admin/category          AdmCategoryR        GET POST
+    /admin/forum             AdmForumR           GET POST
+    /admin/ban               AdmBanR             GET POST
+    /admin/ban/options       AdmBanOptionsR      POST
+    /admin/user              AdmUserR            GET POST
+    /admin/user/promote      AdmUserPromoteR     POST
+    /admin/user/promote/exe  AdmUserPromoteExeR  POST
+    /forum/#Int64            ForumR              GET POST
+    /forum/#Int64/#Int64     ForumPageR          GET
+    /topic/#Int64            TopicR              GET POST
+    /topic/#Int64/#Int64     TopicPageR          GET
+    /post/#Int64             PostR               GET
+    /post/#Int64/edit        PostEditR           GET POST
   |]
 
 type Form a = Html -> MForm (HandlerFor App) (FormResult a, Widget)

@@ -44,6 +44,23 @@ selectGroupByUsername username = do
       limit 1
       return (user ^. UsersId, group ^. GroupsId, group ^. GroupsGrouping)
 
+selectGroupByUserId ::
+     ( PersistUniqueRead backend
+     , PersistQueryRead backend
+     , BackendCompatible SqlBackend backend
+     , MonadIO m
+     )
+  => Key Users
+  -> ReaderT backend m [(Value (Key Users), Value (Key Groups), Value Grouping)]
+selectGroupByUserId userid = do
+  select $
+    from $ \(user, group) -> do
+      where_
+        (user ^. UsersGroupId ==. group ^. GroupsId
+         &&. user ^. UsersId ==. val userid)
+      limit 1
+      return (user ^. UsersId, group ^. GroupsId, group ^. GroupsGrouping)
+
 selectAllGroups ::
      ( PersistUniqueRead backend
      , PersistQueryRead backend

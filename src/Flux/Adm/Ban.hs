@@ -38,6 +38,10 @@ banUser execid execname execgroup username ip message = do
         (Right _, True)  -> invalidArgs ["You cannot ban yourself."]
         (Left x, _)      -> invalidArgs [x]
 
+banUserById execid execname execgroup userid ip message = do
+  [user] <- liftHandler $ runDB $ selectUserById userid
+  banUser execid execname execgroup (usersUsername $ entityVal user) ip message
+
 unbanUser ::
      ( YesodPersistBackend (HandlerSite m) ~ SqlBackend
      , YesodPersist (HandlerSite m)

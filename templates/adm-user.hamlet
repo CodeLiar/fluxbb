@@ -4,7 +4,7 @@
   <input .button name=search value=search type=submit>
 
 <h4> Result
-<form action="#" method=post enctype=#{enct}>
+<form action=@{AdmUserPromoteR} method=post enctype=#{enct}>
   <table>
     <thead>
       <th> Username

@@ -20,6 +20,7 @@ dependencies:
 - shakespeare
 - template-haskell
 - time
+- text
 - yaml
 - yesod
 - yesod-auth-hashdb
