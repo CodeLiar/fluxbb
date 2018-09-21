@@ -8,9 +8,11 @@ module Flux.Topic where
 import           Import             hiding (Value)
 
 import           Database.Esqueleto
+import           DBOp.CRUDForum
 import           DBOp.CRUDPost
 import           DBOp.CRUDTopic
-import           DBOp.CRUDForum
+
+import           Handler.Profile
 
 getTopicById ::
      ( BackendCompatible SqlBackend (YesodPersistBackend (HandlerSite m))

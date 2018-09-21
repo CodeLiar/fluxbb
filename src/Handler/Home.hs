@@ -7,6 +7,7 @@ import Import
 
 import           Database.Esqueleto
 import           Flux.Home
+import           Flux.Post
 
 getHomeR :: Handler Html
 getHomeR = do

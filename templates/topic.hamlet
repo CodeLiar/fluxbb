@@ -5,7 +5,7 @@
   <span> »
   <a href=@{TopicR tid}> #{topicsSubject $ entityVal topic}
 
-$forall (Entity pid (Posts tid n uname uid t content)) <- posts
+$forall (Entity pid (Posts tid n uname uid' t content)) <- posts
   <.row.row-no-padding>
     <.column.column-100>
       <span>#{show $ utcToLocalTime timeZone $ t}
@@ -16,6 +16,13 @@ $forall (Entity pid (Posts tid n uname uid t content)) <- posts
     <.column.column-80>
       <.row>
         <.column.column-100> #{content}
+          <.row.row-no-padding>
+    <.column.column-10.column-offset-80>
+      $if canEdit uid uid' group
+        <span .float-right>
+          <a href=@{PostEditR $ fromSqlKey pid}> Edit
+    <.column.column-10>
+      <span .float-right #post-#{n}> Report
 
 <form method=post action=@{TopicR tid} enctype=#{enct}>
   ^{wid}

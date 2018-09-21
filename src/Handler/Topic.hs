@@ -9,9 +9,9 @@ import           Import
 import           Data.Time.LocalTime
 import           Database.Esqueleto
 
-import           Flux.Topic
-import           Flux.Post
 import           Flux.Forum
+import           Flux.Post
+import           Flux.Topic
 
 data PostForm = PostForm
   { postFormContent :: Textarea
@@ -35,6 +35,9 @@ postTopicR tid = do
       (_, page, num) <- replyTopicByPosting uid name (toSqlKey tid) content
       redirect $ TopicPageR tid page :#: ("post-" <> show num)
     _ -> defaultLayout [whamlet|Please.|]
+
+canEdit uid puid group =
+  uid == puid || group == Administrator || group == Moderator
 
 getTopicPageR :: Int64 -> Int64 -> Handler Html
 getTopicPageR tid page = do

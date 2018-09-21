@@ -24,7 +24,7 @@ $forall (category, forums) <- categoriesforindex
           <td> #{frep}
           $maybe lastpost <- flp
             $maybe lastpostid <- flpid
-              <td> <a href=#{fromSqlKey lastpostid}> #{show lastpost}
+              <td> <a href=@{PostR $ fromSqlKey lastpostid}> #{show lastpost}
             $nothing
               <td> Never
           $nothing

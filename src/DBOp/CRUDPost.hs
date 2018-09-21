@@ -49,3 +49,48 @@ selectPostByTopicId tid page = do
       limit 25
       return post
 
+selectPostById ::
+     ( PersistUniqueRead backend
+     , PersistQueryRead backend
+     , BackendCompatible SqlBackend backend
+     , MonadIO m
+     )
+  => Key Posts
+  -> ReaderT backend m [Entity Posts]
+selectPostById pid = do
+  select $
+    from $ \post -> do
+      where_ (post ^. PostsId ==. val pid)
+      limit 1
+      return post
+
+selectPostAndItsParentsInfo ::
+     ( PersistUniqueRead backend
+     , PersistQueryRead backend
+     , BackendCompatible SqlBackend backend
+     , MonadIO m
+     )
+  => Key Posts
+  -> ReaderT backend m [( Value Text
+                        , Value (Key Forums)
+                        , Value Text
+                        , Entity Posts)]
+selectPostAndItsParentsInfo pid = do
+  select $
+    from $ \(post `InnerJoin` topic `InnerJoin` forum) -> do
+      on (forum ^. ForumsId ==. topic ^. TopicsForumId)
+      on (topic ^. TopicsId ==. post ^. PostsTopicId)
+      where_ (post ^. PostsId ==. val pid)
+      limit 1
+      return
+        ( forum ^. ForumsName
+        , forum ^. ForumsId
+        , topic ^. TopicsSubject
+        , post)
+
+updatePostContent pid content = do
+  update $ \post -> do
+    set post [PostsContent =. val content]
+    where_ (post ^. PostsId ==. val pid)
+
+
