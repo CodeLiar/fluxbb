@@ -1,0 +1,31 @@
+<a href=@{UserR userid}>
+  <p> Go back
+
+<table>
+  <thead>
+    <th> Forum
+    <th> Subject
+    <th> Replies
+    <th> Start Time
+    <th> Last Active
+    <th> Last Poster
+  <tbody>
+    $forall (fname, (Entity key (Topics fid poster subject repcount start lastpost lastpostid lastposter locked))) <- topics
+      <tr>
+        <td> <a href=@{ForumR $ fromSqlKey fid}> #{fname}
+        <td> <a href=@{TopicR $ fromSqlKey key}> #{subject}
+        <td> #{repcount}
+        <td> #{show $ utcToLocalTime timeZone start}
+        $maybe last <- lastpost
+          $maybe lastid <- lastpostid
+            <td>
+              <a href=@{PostR $ fromSqlKey lastid}> #{show $ utcToLocalTime timeZone last}
+          $nothing
+            <td> Still Empty.
+        $nothing
+          <td> Still Empty.
+        $maybe last <- lastposter
+          <td> #{last}
+        $nothing
+          <td> Still Empty.
+

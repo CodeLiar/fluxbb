@@ -17,10 +17,10 @@
   <.column>
     <p> Topic Started:
   <.column.column-75>
-    <a href="#"> <p> #{usersTopicsStarted user}
+    <a href=@{UserTopicsR uid}> <p> #{usersTopicsStarted user}
 <.row>
   <.column>
     <p> Reply Posted:
   <.column.column-75>
-    <a href="#"> <p> #{usersRepliesPosted user}
+    <a href=@{UserPostsR uid}> <p> #{usersRepliesPosted user}
 

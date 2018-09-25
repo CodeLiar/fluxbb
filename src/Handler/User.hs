@@ -252,3 +252,17 @@ postUserAdminR userid = do
           redirect $ UserR userid
         _ -> invalidArgs ["Please fill the form correctly."]
 
+getUserPostsR :: Int64 -> Handler Html
+getUserPostsR userid = do
+  (uid, name, group) <- allowedToPost
+  user'@(Entity uid' user) <- getUserById $ toSqlKey userid
+  posts <- getUserPosts $ toSqlKey userid
+  profileLayout uid name group user' $(widgetFile "profile-info-posts")
+
+getUserTopicsR :: Int64 -> Handler Html
+getUserTopicsR userid = do
+  (uid, name, group) <- allowedToPost
+  user'@(Entity uid' user) <- getUserById $ toSqlKey userid
+  topics <- getUserTopics $ toSqlKey userid
+  profileLayout uid name group user' $(widgetFile "profile-info-topics")
+

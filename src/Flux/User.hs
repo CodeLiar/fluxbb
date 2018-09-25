@@ -11,6 +11,8 @@ import           Database.Esqueleto
 import           Yesod.Auth.Util.PasswordStore
 
 import           DBOp.CRUDGroup
+import           DBOp.CRUDPost
+import           DBOp.CRUDTopic
 import           DBOp.CRUDUser
 
 import           Flux.Miscellaneous
@@ -143,6 +145,15 @@ selfUpdateInfoByUser userid userpass oldpass newpass email = do
               updateUserPassword userid (Just $ decodeUtf8 newpassword)
         else invalidArgs ["Your password don't match with the old one."]
 
+updateInfoByAdmin ::
+     ( YesodPersistBackend (HandlerSite m) ~ SqlBackend
+     , MonadHandler m
+     , YesodPersist (HandlerSite m)
+     )
+  => Key Users
+  -> Maybe Text
+  -> Text
+  -> m ()
 updateInfoByAdmin userid Nothing email = liftHandler $ runDB $ updateUserEmail userid email
 updateInfoByAdmin userid (Just np) email =
   liftHandler $
@@ -150,4 +161,28 @@ updateInfoByAdmin userid (Just np) email =
     newpassword <- liftIO $ makePassword (encodeUtf8 np) 17
     updateUserEmail userid email
     updateUserPassword userid (Just $ decodeUtf8 newpassword)
+
+getUserPosts ::
+     ( BackendCompatible SqlBackend (YesodPersistBackend (HandlerSite m))
+     , PersistQueryRead (YesodPersistBackend (HandlerSite m))
+     , PersistUniqueRead (YesodPersistBackend (HandlerSite m))
+     , YesodPersist (HandlerSite m)
+     , MonadHandler m
+     )
+  => Key Users
+  -> m [Entity Posts]
+getUserPosts = liftHandler . runDB . selectPostByPosterId
+
+getUserTopics ::
+     ( BackendCompatible SqlBackend (YesodPersistBackend (HandlerSite m))
+     , PersistQueryRead (YesodPersistBackend (HandlerSite m))
+     , PersistUniqueRead (YesodPersistBackend (HandlerSite m))
+     , YesodPersist (HandlerSite m)
+     , MonadHandler m
+     )
+  => Key Users
+  -> m [(Text, Entity Topics)]
+getUserTopics userid = do
+  topics <- liftHandler . runDB . selectTopicForumNameByPosterId $ userid
+  return $ map (\(Value forumname, x) -> (forumname, x)) topics
 

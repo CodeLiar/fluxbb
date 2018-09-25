@@ -11,6 +11,7 @@ import           Database.Esqueleto
 import           DBOp.CRUDForum
 import           DBOp.CRUDPost
 import           DBOp.CRUDTopic
+import           DBOp.CRUDUser
 
 import           Handler.User
 
@@ -49,5 +50,6 @@ replyTopicByPosting uid uname tid content = do
             pid
             now
           updateTopicIncrementReplyAndLasts tid uname pid now
+          updateUserIncrementPost uid
       return (tid, page, num + 2)
 

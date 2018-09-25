@@ -1,0 +1,14 @@
+<a href=@{UserR userid}>
+  <p> Go back
+
+<table>
+  <thead>
+    <th width="30%"> When
+    <th width="70%"> What
+  <tbody>
+    $forall (Entity key (Posts tid n uname _ t content)) <- posts
+      <tr>
+        <td>
+          <a href=@{PostR $ fromSqlKey key}> #{show $ utcToLocalTime timeZone $ t}
+        <td> #{content}
+

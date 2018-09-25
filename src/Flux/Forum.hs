@@ -12,6 +12,7 @@ import           Database.Esqueleto
 import           DBOp.CRUDForum
 import           DBOp.CRUDPost
 import           DBOp.CRUDTopic
+import           DBOp.CRUDUser
 
 import           Flux.Topic
 
@@ -60,6 +61,7 @@ createTopicByPosting fid userid username subject content = do
   liftHandler $ runDB $ do
     _ <- insertPost tid 1 username userid content
     updateForumIncrementTopic fid
+    updateUserIncrementTopic userid
   return tid
 
 lockUnlockTopic ::

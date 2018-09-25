@@ -12,7 +12,7 @@ $forall (Entity pid (Posts tid n uname posterid t content)) <- posts
       <span .float-right #post-#{n}> #{n}
   <.row.row-no-padding>
     <.column.column-20>
-      <a href=@{HomeR}> #{uname}
+      <a href=@{UserR $ fromSqlKey posterid}> #{uname}
     <.column.column-80>
       <.row>
         <.column.column-100> #{content}

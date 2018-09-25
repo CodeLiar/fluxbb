@@ -71,3 +71,20 @@ updateTopicIncrementReplyAndLasts tid username pid now = do
       ]
     where_ (topic ^. TopicsId ==. val tid)
 
+selectTopicForumNameByPosterId ::
+     ( PersistUniqueRead backend
+     , PersistQueryRead backend
+     , BackendCompatible SqlBackend backend
+     , MonadIO m
+     )
+  => Key Users
+  -> ReaderT backend m [(Value Text, Entity Topics)]
+selectTopicForumNameByPosterId userid = do
+  select $
+    from $ \(forum `InnerJoin` topic `InnerJoin` user) -> do
+      on (topic ^. TopicsPoster ==. user ^. UsersUsername)
+      on (topic ^. TopicsForumId ==. forum ^. ForumsId)
+      where_ (user ^. UsersId ==. val userid)
+      orderBy [asc (topic ^. TopicsLastPost)]
+      return (forum ^. ForumsName, topic)
+
