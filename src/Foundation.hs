@@ -40,6 +40,7 @@ mkYesodData
     /profile                 ProfileR            GET
     /user/#Int64             UserR               GET
     /user/#Int64/edit        UserEditR           GET POST
+    /user/#Int64/admin       UserAdminR          GET POST
     /admin                   AdmR                GET
     /admin/category          AdmCategoryR        GET POST
     /admin/forum             AdmForumR           GET POST
@@ -218,10 +219,12 @@ allowedToEditProfile uid group profileid =
   profileid == uid || group == Administrator
 
 profileRouteToText :: Route App -> Text
-profileRouteToText ProfileR      = "Common Information"
-profileRouteToText (UserR _)     = "Common Information"
-profileRouteToText (UserEditR _) = "Edit Common Information"
-profileRouteToText _             = "Not Needed"
+profileRouteToText ProfileR       = "Common Information"
+profileRouteToText (UserR _)      = "Common Information"
+profileRouteToText (UserEditR _)  = "Edit Common Information"
+profileRouteToText (UserAdminR _) = "Promote User"
+profileRouteToText _              = "Not Needed"
+
 
 data SortBy
   = Username

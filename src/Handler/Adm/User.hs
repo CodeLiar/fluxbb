@@ -23,17 +23,9 @@ data SearchUserForm = SearchUserForm
 searchUserForm :: [Entity Groups] -> Form SearchUserForm
 searchUserForm groups =
   renderDivs $ SearchUserForm
-  <$> aopt (selectFieldList glist) "Groups" Nothing
+  <$> aopt (selectFieldList $ glist groups) "Groups" Nothing
   <*> aopt textField "Username" Nothing
   <*> aopt textField "Email" Nothing
-  where
-    glist :: [(Text, Int64)]
-    glist =
-      map
-        (\x ->
-           ( pack . show . groupsGrouping $ entityVal x
-           , fromSqlKey . entityKey $ x))
-        groups
 
 data BanUsersOptionsForm = BanUsersOptionsForm
   { banUsersOptionsFormMessessage :: Maybe Text
@@ -54,12 +46,8 @@ data PromoteUsersForm = PromoteUsersForm
 promoteUsersForm :: [Entity Groups] -> Text -> Form PromoteUsersForm
 promoteUsersForm groups userids =
   renderDivs $ PromoteUsersForm
-  <$> areq (selectFieldList glist) "Group" Nothing
+  <$> areq (selectFieldList $ glist groups) "Group" Nothing
   <*> areq hiddenField "" (Just userids)
-  where
-    glist :: [(Text, Int64)]
-    glist =
-      map (\(Entity cid (Groups g)) -> (pack $ show g, fromSqlKey cid)) groups
 
 groupToHtml :: Grouping -> Html
 groupToHtml = toHtml . show

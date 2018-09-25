@@ -11,6 +11,9 @@ import           Database.Persist.Sql
 
 import           Flux.Miscellaneous
 import           Flux.User
+import           Flux.Adm.User
+import           Flux.Adm.Ban
+
 
 data RegisterForm = RegisterForm
   { registerFormUsername :: Text
@@ -36,17 +39,9 @@ searchUserForm :: [Entity Groups] -> Form SearchUserForm
 searchUserForm groups = renderDivs $
   SearchUserForm
   <$> aopt textField "Username" Nothing
-  <*> aopt (selectFieldList glist) "Groups" Nothing
+  <*> aopt (selectFieldList $ glist groups) "Groups" Nothing
   <*> areq (selectFieldList slist) "Sort By" Nothing
   <*> areq (selectFieldList alist) "Sort Order" Nothing
-  where
-    glist :: [(Text, Int64)]
-    glist =
-      map
-        (\x ->
-           ( pack . show . groupsGrouping $ entityVal x
-           , fromSqlKey . entityKey $ x))
-        groups
     slist :: [(Text, SortBy)]
     slist = map (pack . show &&& id) [minBound .. maxBound]
     alist :: [(Text, Bool)]
@@ -191,4 +186,69 @@ postUserEditR userid = do
         _ -> do
           profileLayout uid name group user' $ do
             [whamlet|Please fill the input correctly|]
+
+data PromoteForm = PromoteForm
+  { promoteFormGroupId :: Int64
+  }
+
+promoteForm :: [Entity Groups] -> Form PromoteForm
+promoteForm groups =
+  renderDivs $ PromoteForm <$> areq (selectFieldList $ glist groups) "Group" Nothing
+
+data BanForm = BanForm
+  { banFormUsername :: Text
+  , banFormIP       :: Maybe Text
+  , banFormMessage  :: Maybe Text
+  }
+
+banForm :: Text -> Form BanForm
+banForm username = renderDivs $
+  BanForm
+  <$> areq textField "Username" (Just username)
+  <*> aopt textField "IP" Nothing
+  <*> aopt textField "Message" Nothing
+
+getUserAdminR :: Int64 -> Handler Html
+getUserAdminR userid = do
+  (uid, name, group) <- allowedToAdmin
+  user'@(Entity uid' user) <- getUserById $ toSqlKey userid
+  ad <- getGroup Administrator
+  mo <- getGroup Moderator
+  me <- getGroup Member
+  (widp, enctp) <- generateFormPost $ promoteForm [ad, mo, me]
+  (widb, enctb) <- generateFormPost $ banForm $ usersUsername $ entityVal user'
+  profileLayout uid name group user' $(widgetFile "profile-info-promote")
+
+postUserAdminR :: Int64 -> Handler Html
+postUserAdminR userid = do
+  (uid, name, group) <- allowedToAdmin
+  promote <- lookupPostParam "promote"
+  ban <- lookupPostParam "ban"
+  case (promote, ban) of
+    (Nothing, Nothing) -> invalidArgs ["Please make up your mind."]
+    (Just _, Just _) -> invalidArgs ["Please make up your mind."]
+    (Just _, Nothing) -> do
+      ad <- getGroup Administrator
+      mo <- getGroup Moderator
+      me <- getGroup Member
+      ((res, _), _) <- runFormPost $ promoteForm [ad, mo, me]
+      case res of
+        FormSuccess r -> do
+          promoteUser
+            uid
+            name
+            group
+            (toSqlKey userid)
+            (toSqlKey $ promoteFormGroupId r)
+          redirect $ UserR userid
+        _ -> invalidArgs ["Please fill the form correctly."]
+    (Nothing, Just _) -> do
+      ((res, _), _) <- runFormPost $ banForm ""
+      case res of
+        FormSuccess r -> do
+          let (username, ip, message) =
+                (banFormUsername r, banFormIP r, banFormMessage r)
+          banUser uid name group (username) (ip) (message)
+          redirect $ UserR userid
+        _ -> invalidArgs ["Please fill the form correctly."]
 

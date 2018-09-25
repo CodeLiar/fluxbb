@@ -1,0 +1,12 @@
+$case group
+  $of Administrator
+    <h4> Promote
+    <form method=post action=@{UserAdminR userid} enctype=#{enctp}>
+      ^{widp}
+      <input .button-primary name=promote value=promote type=submit>
+    <h4> Ban
+    <form method=post action=@{UserAdminR userid} enctype=#{enctb}>
+      ^{widb}
+      <input .button-primary name=ban value=ban type=submit>
+  $of _
+

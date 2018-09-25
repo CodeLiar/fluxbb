@@ -47,7 +47,7 @@
               $case group
                 $of Administrator
                   <tr>
-                    <td> <a href="#"> Administration
+                    <td> <a href=@{UserAdminR $ fromSqlKey $ entityKey user}> Administration
                 $of _
           <.column.column-75.column-offset-5>
             $maybe message <- mmessage
