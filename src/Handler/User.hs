@@ -42,6 +42,7 @@ searchUserForm groups = renderDivs $
   <*> aopt (selectFieldList $ glist groups) "Groups" Nothing
   <*> areq (selectFieldList slist) "Sort By" Nothing
   <*> areq (selectFieldList alist) "Sort Order" Nothing
+  where
     slist :: [(Text, SortBy)]
     slist = map (pack . show &&& id) [minBound .. maxBound]
     alist :: [(Text, Bool)]

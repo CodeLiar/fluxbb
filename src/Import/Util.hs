@@ -5,7 +5,7 @@ module Import.Util
   , glist
   ) where
 
-import           ClassyPrelude.Yesod
+import           ClassyPrelude.Yesod hiding ((.), map)
 import           Data.Time.LocalTime
 import           Database.Esqueleto  (fromSqlKey)
 
