@@ -55,6 +55,7 @@ mkYesodData
     /post/#Int64             PostR               GET
     /post/#Int64/edit        PostEditR           GET POST
     /post/#Int64/report      PostReportR         GET POST
+    /userlist                UserListR           GET POST
   |]
 
 type Form a = Html -> MForm (HandlerFor App) (FormResult a, Widget)
@@ -220,4 +221,14 @@ profileRouteToText ProfileR  = "Common Information"
 profileRouteToText (UserR _) = "Common Information of user"
 profileRouteToText _         = "Not Needed"
 
+data SortBy
+  = Username
+  | Registered
+  | PostCount
+  deriving (Eq, Enum, Bounded)
+
+instance Show SortBy where
+  show Username   = "Username"
+  show Registered = "Registration Date"
+  show PostCount  = "Post Count"
 

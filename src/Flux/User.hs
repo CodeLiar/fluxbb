@@ -13,6 +13,8 @@ import           Yesod.Auth.Util.PasswordStore
 import           DBOp.CRUDGroup
 import           DBOp.CRUDUser
 
+import           Flux.Miscellaneous
+
 unusedUser ::
      ( BackendCompatible SqlBackend (YesodPersistBackend (HandlerSite m))
      , PersistQueryRead (YesodPersistBackend (HandlerSite m))
@@ -78,4 +80,21 @@ getUsersByConditions mgid musername memail = do
   userandgroup <-
     liftHandler $ runDB $ selectUsersByConditions mgid musername memail
   return $ map (\(user, Value group) -> (user, group)) userandgroup
+
+getAllUsers ::
+     ( BackendCompatible SqlBackend (YesodPersistBackend (HandlerSite m))
+     , PersistQueryRead (YesodPersistBackend (HandlerSite m))
+     , PersistUniqueRead (YesodPersistBackend (HandlerSite m))
+     , YesodPersist (HandlerSite m)
+     , MonadHandler m
+     )
+  => Bool
+  -> m [(Grouping, Entity Users)]
+getAllUsers ascending = do
+  groupandusers <- liftHandler $ runDB $ selectAllUsers ascending
+  return $ map (\(Value a, x) -> (a, x)) groupandusers
+
+searchUserByConditions username groupid orderby ascending = do
+  groupandusers <- liftHandler $ runDB $ selectUsersBySearchConditions username groupid orderby ascending
+  return $ map (\(Value a, x) -> (a, x)) groupandusers
 

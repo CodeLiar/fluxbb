@@ -1,0 +1,20 @@
+<form method=post action=@{UserListR} enctype=#{enct}>
+  ^{wid}
+  <input .button-primary name=search value=search type=submit>
+
+<table>
+  <thead>
+    <tr>
+      <th> Username
+      <th> Title
+      <th> Posts
+      <th> Registered
+  <tbody>
+    $forall (group, Entity keyuser (Users _ uname email _ joined ts rp)) <- users
+      <tr>
+        <td>
+          <a href=@{UserR $ fromSqlKey keyuser}> #{uname}
+        <td> #{show group}
+        <td> #{rp}
+        <td> #{show $ utcToLocalTime timeZone joined}
+

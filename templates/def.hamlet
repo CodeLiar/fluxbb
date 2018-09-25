@@ -9,15 +9,15 @@
             <li .navigation-item>
               <a .navigation-link href=@{AdmR}> Administration
             <li .navigation-item>
-              <a .navigation-link href="#" title="Users"> Users
+              <a .navigation-link href=@{UserListR} title="Users"> Users
           $of Moderator
             <li .navigation-item>
               <a .navigation-link href=@{AdmR}> Administration
             <li .navigation-item>
-              <a .navigation-link href="#" title="Users"> Users
+              <a .navigation-link href=@{UserListR} title="Users"> Users
           $of Member
             <li .navigation-item>
-              <a .navigation-link href="#" title="Users"> Users
+              <a .navigation-link href=@{UserListR} title="Users"> Users
           $of Banned
         
     <ul .navigation-list.float-right>

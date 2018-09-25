@@ -9,6 +9,7 @@ import           Import
 import           Data.Time.LocalTime
 import           Database.Persist.Sql
 
+import           Flux.Miscellaneous
 import           Flux.User
 
 data RegisterForm = RegisterForm
@@ -23,6 +24,33 @@ registerForm =
   <$> areq textField "Username" Nothing
   <*> areq passwordField "Password" Nothing
   <*> areq emailField "Email" Nothing
+
+data SearchUserForm = SearchUserForm
+  { searchUserFormUsername  :: Maybe Text
+  , searchUserFormGroup     :: Maybe Int64
+  , searchUserFormSortBy    :: SortBy
+  , searchUserFormAscending :: Bool
+  }
+
+searchUserForm :: [Entity Groups] -> Form SearchUserForm
+searchUserForm groups = renderDivs $
+  SearchUserForm
+  <$> aopt textField "Username" Nothing
+  <*> aopt (selectFieldList glist) "Groups" Nothing
+  <*> areq (selectFieldList slist) "Sort By" Nothing
+  <*> areq (selectFieldList alist) "Sort Order" Nothing
+  where
+    glist :: [(Text, Int64)]
+    glist =
+      map
+        (\x ->
+           ( pack . show . groupsGrouping $ entityVal x
+           , fromSqlKey . entityKey $ x))
+        groups
+    slist :: [(Text, SortBy)]
+    slist = map (pack . show &&& id) [minBound .. maxBound]
+    alist :: [(Text, Bool)]
+    alist = [("Ascending", True), ("Descending", False)]
 
 getRegisterR :: Handler Html
 getRegisterR = do
@@ -60,4 +88,35 @@ getUserR uid = do
   user'@(Entity uid' user) <- getUserById $ toSqlKey uid
   profileLayout ruid name group user' $(widgetFile "profile-info")
 
+getUserListR :: Handler Html
+getUserListR = do
+  (uid, name, group) <- allowedToPost
+  let users = [] :: [(Grouping, Entity Users)]
+  ad <- getGroup Administrator
+  mo <- getGroup Moderator
+  me <- getGroup Member
+  (wid, enct) <- generateFormPost $ searchUserForm [ad, mo, me]
+  defaultLayout $ do
+    setTitle "User List"
+    $(widgetFile "user-list")
+
+postUserListR :: Handler Html
+postUserListR = do
+  (uid, name, group) <- allowedToPost
+  ad <- getGroup Administrator
+  mo <- getGroup Moderator
+  me <- getGroup Member
+  ((res, wid), enct) <- runFormPost $ searchUserForm [ad, mo, me]
+  case res of
+    FormSuccess r -> do
+      let (username, groupid, orderby, ascending) =
+            ( searchUserFormUsername r
+            , toSqlKey <$> searchUserFormGroup r
+            , searchUserFormSortBy r
+            , searchUserFormAscending r)
+      users <- searchUserByConditions username groupid orderby ascending
+      defaultLayout $ do
+        setTitle "User List"
+        $(widgetFile "user-list")
+    _ -> error ""
 
