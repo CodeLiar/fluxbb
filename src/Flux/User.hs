@@ -94,9 +94,60 @@ getAllUsers ascending = do
   groupandusers <- liftHandler $ runDB $ selectAllUsers ascending
   return $ map (\(Value a, x) -> (a, x)) groupandusers
 
+searchUserByConditions ::
+     ( BackendCompatible SqlBackend (YesodPersistBackend (HandlerSite m))
+     , PersistQueryRead (YesodPersistBackend (HandlerSite m))
+     , PersistUniqueRead (YesodPersistBackend (HandlerSite m))
+     , YesodPersist (HandlerSite m)
+     , MonadHandler m
+     )
+  => Maybe Text
+  -> Maybe (Key Groups)
+  -> SortBy
+  -> Bool
+  -> m [(Grouping, Entity Users)]
 searchUserByConditions username groupid orderby ascending = do
   groupandusers <-
     liftHandler $
     runDB $ selectUsersBySearchConditions username groupid orderby ascending
   return $ map (\(Value a, x) -> (a, x)) groupandusers
+
+selfUpdateInfoByUser ::
+     ( YesodPersistBackend (HandlerSite m) ~ SqlBackend
+     , MonadHandler m
+     , YesodPersist (HandlerSite m)
+     )
+  => Key Users
+  -> Maybe Text
+  -> Maybe Text
+  -> Maybe Text
+  -> Text
+  -> m ()
+selfUpdateInfoByUser userid userpass oldpass newpass email = do
+  case (userpass, oldpass, newpass) of
+    (Nothing, _, _) -> error "Your profile is broken. Ask admin to fix this."
+    (Just _, Nothing, Nothing) ->
+      liftHandler $ runDB $ updateUserEmail userid email
+    (Just _, Nothing, Just _) ->
+      invalidArgs
+        ["You cannot update your password without providing your old password."]
+    (Just _, Just _, Nothing) ->
+      invalidArgs ["You cannot use an empty password."]
+    (Just up, Just op, Just np) -> do
+      if verifyPassword (encodeUtf8 op) (encodeUtf8 up)
+        then do
+          newpassword <- liftIO $ makePassword (encodeUtf8 np) 17
+          liftHandler $
+            runDB $ do
+              updateUserEmail userid email
+              updateUserPassword userid (Just $ decodeUtf8 newpassword)
+        else invalidArgs ["Your password don't match with the old one."]
+
+updateInfoByAdmin userid Nothing email = liftHandler $ runDB $ updateUserEmail userid email
+updateInfoByAdmin userid (Just np) email =
+  liftHandler $
+  runDB $ do
+    newpassword <- liftIO $ makePassword (encodeUtf8 np) 17
+    updateUserEmail userid email
+    updateUserPassword userid (Just $ decodeUtf8 newpassword)
 

@@ -130,7 +130,11 @@ ordering b user Username   = orderBy [(chooseAscension b) (user ^. UsersUsername
 ordering b user Registered = orderBy [(chooseAscension b) (user ^. UsersJoinTime)]
 ordering b user PostCount  = orderBy [(chooseAscension b) (user ^. UsersRepliesPosted)]
 
-chooseAscension :: (Esqueleto query expr backend, PersistField a) => Bool -> expr (Value a) -> expr OrderBy
+chooseAscension ::
+     (Esqueleto query expr backend, PersistField a)
+  => Bool
+  -> expr (Value a)
+  -> expr OrderBy
 chooseAscension True e  = asc e
 chooseAscension False e = desc e
 
@@ -152,4 +156,18 @@ selectAllUsers ascending = do
       where_ (user ^. UsersGroupId ==. group ^. GroupsId)
       orderBy [op (user ^. UsersUsername)]
       return (group ^. GroupsGrouping, user)
+
+updateUserEmail ::
+  MonadIO m => Key Users -> Text -> ReaderT SqlBackend m ()
+updateUserEmail uid email = do
+  update $ \user -> do
+    set user [UsersEmail =. val email]
+    where_ (user ^. UsersId ==. val uid)
+
+updateUserPassword ::
+     MonadIO m => Key Users -> Maybe Text -> ReaderT SqlBackend m ()
+updateUserPassword uid password = do
+  update $ \user -> do
+    set user [UsersPassword =. val password]
+    where_ (user ^. UsersId ==. val uid)
 

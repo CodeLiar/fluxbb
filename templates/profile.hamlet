@@ -6,7 +6,7 @@
       $case group
         $of Administrator
           <li .navigation-item>
-            <a .navigation-link href=@{AdmR} title="Management"> Management
+            <a .navigation-link href=@{AdmR} title="Administration"> Administration
           <li .navigation-item>
             <a .navigation-link href=@{UserListR} title="Users"> Users
         $of Moderator
@@ -43,15 +43,12 @@
               <tr>
                 <thead> <h5> Profile Menu
               <tr>
-                <td> <a href="#"> Edit Essentials
-                $case group
-                  $of Administrator
-                    <tr>
-                      <td> <a href="#"> Administration
-                  $of Moderator
-                    <tr>
-                      <td> <a href="#"> Administration
-                  $of _
+                <td> <a href=@{UserEditR $ fromSqlKey $ entityKey user}> Edit Essentials
+              $case group
+                $of Administrator
+                  <tr>
+                    <td> <a href="#"> Administration
+                $of _
           <.column.column-75.column-offset-5>
             $maybe message <- mmessage
               #{message}

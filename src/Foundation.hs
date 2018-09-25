@@ -39,6 +39,7 @@ mkYesodData
     /register                RegisterR           GET POST
     /profile                 ProfileR            GET
     /user/#Int64             UserR               GET
+    /user/#Int64/edit        UserEditR           GET POST
     /admin                   AdmR                GET
     /admin/category          AdmCategoryR        GET POST
     /admin/forum             AdmForumR           GET POST
@@ -214,12 +215,13 @@ profileLayout uid name group user widget = do
   withUrlRenderer $(hamletFile "templates/wrapper.hamlet")
 
 allowedToEditProfile uid group profileid =
-  profileid == uid || group == Administrator || group == Moderator
+  profileid == uid || group == Administrator
 
 profileRouteToText :: Route App -> Text
-profileRouteToText ProfileR  = "Common Information"
-profileRouteToText (UserR _) = "Common Information of user"
-profileRouteToText _         = "Not Needed"
+profileRouteToText ProfileR      = "Common Information"
+profileRouteToText (UserR _)     = "Common Information"
+profileRouteToText (UserEditR _) = "Edit Common Information"
+profileRouteToText _             = "Not Needed"
 
 data SortBy
   = Username

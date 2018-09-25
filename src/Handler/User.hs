@@ -52,6 +52,30 @@ searchUserForm groups = renderDivs $
     alist :: [(Text, Bool)]
     alist = [("Ascending", True), ("Descending", False)]
 
+data EditByUserForm = EditByUserForm
+  { editByUserFormOldPass :: Maybe Text
+  , editByUserFormNewPass :: Maybe Text
+  , editByUserFormEmail   :: Text
+  }
+
+editByUserForm :: Text -> Form EditByUserForm
+editByUserForm email = renderDivs $
+  EditByUserForm
+  <$> aopt passwordField "Old Password" Nothing
+  <*> aopt passwordField "New Password" Nothing
+  <*> areq emailField "Email" (Just email)
+
+data EditByAdminForm = EditByAdminForm
+  { editByAdminFormNewPass :: Maybe Text
+  , editByAdminFormEmail   :: Text
+  }
+
+editByAdminForm :: Text -> Form EditByAdminForm
+editByAdminForm email = renderDivs $
+  EditByAdminForm
+  <$> aopt passwordField "New Password" Nothing
+  <*> areq emailField "Email" (Just email)
+
 getRegisterR :: Handler Html
 getRegisterR = do
   isNotLoggedIn
@@ -119,4 +143,52 @@ postUserListR = do
         setTitle "User List"
         $(widgetFile "user-list")
     _ -> error ""
+
+allowedToActuallyEdit :: Int64 -> HandlerFor App (Key Users, Text, Grouping)
+allowedToActuallyEdit pid = do
+  (uid, name, group) <- allowedToPost
+  if uid == toSqlKey pid || group == Administrator
+    then return (uid, name, group)
+    else permissionDenied "You're not allowed to edit user's information."
+
+generateFormEdit :: Grouping -> Text -> Handler (Widget, Enctype)
+generateFormEdit Administrator = generateFormPost . editByAdminForm
+generateFormEdit _             = generateFormPost . editByUserForm
+
+getUserEditR :: Int64 -> Handler Html
+getUserEditR userid = do
+  (uid, name, group) <- allowedToActuallyEdit userid
+  user'@(Entity uid' user) <- getUserById $ toSqlKey userid
+  (wid, enct) <- generateFormEdit group (usersEmail user)
+  profileLayout uid name group user' $(widgetFile "profile-info-edit")
+
+postUserEditR :: Int64 -> Handler Html
+postUserEditR userid = do
+  (uid, name, group) <- allowedToActuallyEdit userid
+  user'@(Entity uid' user) <- getUserById $ toSqlKey userid
+  case group of
+    Administrator -> do
+      ((res, wid), enct) <- runFormPost $ editByAdminForm (usersEmail user)
+      case res of
+        FormSuccess r -> do
+          let (newpass, email) =
+                (editByAdminFormNewPass r, editByAdminFormEmail r)
+          updateInfoByAdmin uid' newpass email
+          redirect $ UserR userid
+        _ -> do
+          profileLayout uid name group user' $ do
+            [whamlet|Please fill the input correctly|]
+    _ -> do
+      ((res, wid), enct) <- runFormPost $ editByUserForm (usersEmail user)
+      case res of
+        FormSuccess r -> do
+          let (oldpass, newpass, email) =
+                ( editByUserFormOldPass r
+                , editByUserFormNewPass r
+                , editByUserFormEmail r)
+          selfUpdateInfoByUser uid (usersPassword user) oldpass newpass email
+          redirect $ UserR userid
+        _ -> do
+          profileLayout uid name group user' $ do
+            [whamlet|Please fill the input correctly|]
 

@@ -1,0 +1,5 @@
+<h4> Update Information
+<form action=@{UserEditR userid} method=post enctype=#{enct}>
+  ^{wid}
+  <input .button-primary name=update value=update type=submit>
+
